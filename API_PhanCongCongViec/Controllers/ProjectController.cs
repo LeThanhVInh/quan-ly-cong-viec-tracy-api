@@ -37,7 +37,7 @@ namespace API_PhanCongCongViec.Controllers
                 DataTable list = Connect.GetTable(@"SELECT P.*, DE.name departmentName
                                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id");
                 if (list != null)
-                    response = new ResponseJson(list, false, "");
+                    response = new ResponseJson(list, false, "t");
             }
 
             return response;
