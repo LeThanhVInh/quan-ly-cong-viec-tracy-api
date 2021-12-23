@@ -22,7 +22,7 @@ namespace API_PhanCongCongViec.Controllers
                                                     WHERE P.id=@id", new string[1] { "@id" }, new object[1] { id });
                 if (item != null)
                     if (item.Rows.Count > 0)
-                        response = new ResponseJson(item, false, "");
+                        response = new ResponseJson(item, false, "âaâ");
             }
             return response;
         }
