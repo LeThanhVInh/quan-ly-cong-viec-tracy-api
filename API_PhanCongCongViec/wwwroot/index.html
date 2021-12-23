@@ -1,0 +1,901 @@
+﻿
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>404</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Ubuntu);
+
+        .my-page {
+            background: #28254C;
+            font-family: 'Ubuntu';
+        }
+
+            .my-page .box {
+                width: 100%;
+                height: 100%;
+                background: #332F63;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+                .my-page .box .box__ghost {
+                    padding: 15px 25px 25px;
+                    position: absolute;
+                    left: 50%;
+                    top: 40%;
+                    transform: translate(-50%, -30%);
+                }
+
+                    .my-page .box .box__ghost .symbol:nth-child(1) {
+                        opacity: .2;
+                        animation: shine 4s ease-in-out 3s infinite;
+                    }
+
+                        .my-page .box .box__ghost .symbol:nth-child(1):before, .my-page .box .box__ghost .symbol:nth-child(1):after {
+                            content: '';
+                            width: 12px;
+                            height: 4px;
+                            background: #fff;
+                            position: absolute;
+                            border-radius: 5px;
+                            bottom: 65px;
+                            left: 0;
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(1):before {
+                            transform: rotate(45deg);
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(1):after {
+                            transform: rotate(-45deg);
+                        }
+
+                    .my-page .box .box__ghost .symbol:nth-child(2) {
+                        position: absolute;
+                        left: -5px;
+                        top: 30px;
+                        height: 18px;
+                        width: 18px;
+                        border: 4px solid;
+                        border-radius: 50%;
+                        border-color: #fff;
+                        opacity: .2;
+                        animation: shine 4s ease-in-out 1.3s infinite;
+                    }
+
+                    .my-page .box .box__ghost .symbol:nth-child(3) {
+                        opacity: .2;
+                        animation: shine 3s ease-in-out .5s infinite;
+                    }
+
+                        .my-page .box .box__ghost .symbol:nth-child(3):before, .my-page .box .box__ghost .symbol:nth-child(3):after {
+                            content: '';
+                            width: 12px;
+                            height: 4px;
+                            background: #fff;
+                            position: absolute;
+                            border-radius: 5px;
+                            top: 5px;
+                            left: 40px;
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(3):before {
+                            transform: rotate(90deg);
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(3):after {
+                            transform: rotate(180deg);
+                        }
+
+                    .my-page .box .box__ghost .symbol:nth-child(4) {
+                        opacity: .2;
+                        animation: shine 6s ease-in-out 1.6s infinite;
+                    }
+
+                        .my-page .box .box__ghost .symbol:nth-child(4):before, .my-page .box .box__ghost .symbol:nth-child(4):after {
+                            content: '';
+                            width: 15px;
+                            height: 4px;
+                            background: #fff;
+                            position: absolute;
+                            border-radius: 5px;
+                            top: 10px;
+                            right: 30px;
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(4):before {
+                            transform: rotate(45deg);
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(4):after {
+                            transform: rotate(-45deg);
+                        }
+
+                    .my-page .box .box__ghost .symbol:nth-child(5) {
+                        position: absolute;
+                        right: 5px;
+                        top: 40px;
+                        height: 12px;
+                        width: 12px;
+                        border: 3px solid;
+                        border-radius: 50%;
+                        border-color: #fff;
+                        opacity: .2;
+                        animation: shine 1.7s ease-in-out 7s infinite;
+                    }
+
+                    .my-page .box .box__ghost .symbol:nth-child(6) {
+                        opacity: .2;
+                        animation: shine 2s ease-in-out 6s infinite;
+                    }
+
+                        .my-page .box .box__ghost .symbol:nth-child(6):before, .box .box__ghost .symbol:nth-child(6):after {
+                            content: '';
+                            width: 15px;
+                            height: 4px;
+                            background: #fff;
+                            position: absolute;
+                            border-radius: 5px;
+                            bottom: 65px;
+                            right: -5px;
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(6):before {
+                            transform: rotate(90deg);
+                        }
+
+                        .my-page .box .box__ghost .symbol:nth-child(6):after {
+                            transform: rotate(180deg);
+                        }
+
+                    .my-page .box .box__ghost .box__ghost-container {
+                        background: #fff;
+                        width: 100px;
+                        height: 100px;
+                        border-radius: 100px 100px 0 0;
+                        position: relative;
+                        margin: 0 auto;
+                        animation: upndown 3s ease-in-out infinite;
+                    }
+
+                        .my-page .box .box__ghost .box__ghost-container .box__ghost-eyes {
+                            position: absolute;
+                            left: 50%;
+                            top: 55%;
+                            height: 12px;
+                            width: 70px;
+                        }
+
+                            .my-page .box .box__ghost .box__ghost-container .box__ghost-eyes .box__eye-left {
+                                width: 12px;
+                                height: 12px;
+                                background: #332F63;
+                                border-radius: 50%;
+                                margin: 0 10px;
+                                position: absolute;
+                                left: 0;
+                            }
+
+                            .my-page .box .box__ghost .box__ghost-container .box__ghost-eyes .box__eye-right {
+                                width: 12px;
+                                height: 12px;
+                                background: #332F63;
+                                border-radius: 50%;
+                                margin: 0 10px;
+                                position: absolute;
+                                right: 0;
+                            }
+
+                        .my-page .box .box__ghost .box__ghost-container .box__ghost-bottom {
+                            display: flex;
+                            position: absolute;
+                            top: 100%;
+                            left: 0;
+                            right: 0;
+                        }
+
+                            .my-page .box .box__ghost .box__ghost-container .box__ghost-bottom div {
+                                flex-grow: 1;
+                                position: relative;
+                                top: -10px;
+                                height: 20px;
+                                border-radius: 100%;
+                                background-color: #fff;
+                            }
+
+                                .my-page .box .box__ghost .box__ghost-container .box__ghost-bottom div:nth-child(2n) {
+                                    top: -12px;
+                                    margin: 0 -0px;
+                                    border-top: 15px solid #332F63;
+                                    background: transparent;
+                                }
+
+                    .my-page .box .box__ghost .box__ghost-shadow {
+                        height: 20px;
+                        box-shadow: 0 50px 15px 5px #3B3769;
+                        border-radius: 50%;
+                        margin: 0 auto;
+                        animation: smallnbig 3s ease-in-out infinite;
+                    }
+
+                .my-page .box .box__description {
+                    position: absolute;
+                    bottom: 20%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+
+                    .my-page .box .box__description .box__description-container {
+                        color: #fff;
+                        text-align: center;
+                        width: 200px;
+                        font-size: 16px;
+                        margin: 0 auto;
+                    }
+
+                        .my-page .box .box__description .box__description-container .box__description-title {
+                            font-size: 24px;
+                            letter-spacing: .5px;
+                        }
+
+                        .my-page .box .box__description .box__description-container .box__description-text {
+                            color: #8C8AA7;
+                            line-height: 20px;
+                            margin-top: 20px;
+                        }
+
+                    .my-page .box .box__description .box__button {
+                        display: block;
+                        position: relative;
+                        background: #FF5E65;
+                        border: 1px solid transparent;
+                        border-radius: 50px;
+                        height: 50px;
+                        text-align: center;
+                        text-decoration: none;
+                        color: #fff;
+                        line-height: 50px;
+                        font-size: 18px;
+                        padding: 0 70px;
+                        white-space: nowrap;
+                        margin-top: 25px;
+                        transition: background .5s ease;
+                        overflow: hidden;
+                        -webkit-mask-image: -webkit-radial-gradient(white, black);
+                    }
+
+                        .my-page .box .box__description .box__button:before {
+                            content: '';
+                            position: absolute;
+                            width: 20px;
+                            height: 100px;
+                            background: #fff;
+                            bottom: -25px;
+                            left: 0;
+                            border: 2px solid #fff;
+                            transform: translateX(-50px) rotate(45deg);
+                            transition: transform .5s ease;
+                        }
+
+                        .my-page .box .box__description .box__button:hover {
+                            background: transparent;
+                            border-color: #fff;
+                        }
+
+                            .my-page .box .box__description .box__button:hover:before {
+                                transform: translateX(250px) rotate(45deg);
+                            }
+
+        @keyframes upndown {
+            0% {
+                transform: translateY(5px);
+            }
+
+            50% {
+                transform: translateY(15px);
+            }
+
+            100% {
+                transform: translateY(5px);
+            }
+        }
+
+        @keyframes smallnbig {
+            0% {
+                width: 90px;
+            }
+
+            50% {
+                width: 100px;
+            }
+
+            100% {
+                width: 90px;
+            }
+        }
+
+        @keyframes shine {
+            0% {
+                opacity: .2;
+            }
+
+            25% {
+                opacity: .1;
+            }
+
+            50% {
+                opacity: .2;
+            }
+
+            100% {
+                opacity: .2;
+            }
+        }
+
+
+        .my-clock {
+            background: #1b1e23;
+            display: -webkit-box;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            flex-direction: column;
+            -webkit-box-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            align-items: center;
+            font-family: sans-serif;
+            color: white;
+        }
+
+            .my-clock p {
+                color: #f4eed7;
+                font-size: 0.8em;
+                opacity: 0.75;
+            }
+
+            .my-clock .clock {
+                height: 200px;
+                width: 200px;
+                border-radius: 100px;
+                display: -webkit-box;
+                display: flex;
+                -webkit-box-pack: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .my-clock .clock__second, .my-clock .clock__minute, .my-clock .clock__hour, .my-clock .clock__indicator {
+                position: absolute;
+                left: calc(50% - 1px);
+                width: 2px;
+                background: #f4eed7;
+                -webkit-transform-origin: bottom center;
+                transform-origin: bottom center;
+                z-index: 2;
+                border-radius: 1px;
+            }
+
+            .my-clock .clock__second {
+                height: 90px;
+                margin-top: 10px;
+                background: #4b9aaa;
+                -webkit-animation: time 60s infinite steps(60);
+                animation: time 60s infinite steps(60);
+                z-index: 3;
+            }
+
+            .my-clock .clock__minute {
+                height: 80px;
+                margin-top: 20px;
+                opacity: 0.75;
+                -webkit-animation: time 3600s linear infinite;
+                animation: time 3600s linear infinite;
+            }
+
+            .my-clock .clock__hour {
+                height: 60px;
+                margin-top: 40px;
+                -webkit-animation: time 43200s linear infinite;
+                animation: time 43200s linear infinite;
+            }
+
+            .my-clock .clock__indicator {
+                height: 98px;
+                border-top: 2px solid #4b9aaa;
+                background: none;
+            }
+
+                .my-clock .clock__indicator:nth-of-type(5n) {
+                    opacity: 1;
+                    height: 93px;
+                    border-top: 7px solid #f4eed7;
+                }
+
+            .my-clock .clock__axis {
+                background: #4b9aaa;
+                width: 5px;
+                height: 5px;
+                border-radius: 3px;
+                position: absolute;
+                z-index: 4;
+                top: 97px;
+            }
+
+            .my-clock section:nth-of-type(1) {
+                -webkit-transform: rotateZ(calc(6deg * 1));
+                transform: rotateZ(calc(6deg * 1));
+            }
+
+            .my-clock section:nth-of-type(2) {
+                -webkit-transform: rotateZ(calc(6deg * 2));
+                transform: rotateZ(calc(6deg * 2));
+            }
+
+            .my-clock section:nth-of-type(3) {
+                -webkit-transform: rotateZ(calc(6deg * 3));
+                transform: rotateZ(calc(6deg * 3));
+            }
+
+            .my-clock section:nth-of-type(4) {
+                -webkit-transform: rotateZ(calc(6deg * 4));
+                transform: rotateZ(calc(6deg * 4));
+            }
+
+            .my-clock section:nth-of-type(5) {
+                -webkit-transform: rotateZ(calc(6deg * 5));
+                transform: rotateZ(calc(6deg * 5));
+            }
+
+            .my-clock section:nth-of-type(6) {
+                -webkit-transform: rotateZ(calc(6deg * 6));
+                transform: rotateZ(calc(6deg * 6));
+            }
+
+            .my-clock section:nth-of-type(7) {
+                -webkit-transform: rotateZ(calc(6deg * 7));
+                transform: rotateZ(calc(6deg * 7));
+            }
+
+            .my-clock section:nth-of-type(8) {
+                -webkit-transform: rotateZ(calc(6deg * 8));
+                transform: rotateZ(calc(6deg * 8));
+            }
+
+            .my-clock section:nth-of-type(9) {
+                -webkit-transform: rotateZ(calc(6deg * 9));
+                transform: rotateZ(calc(6deg * 9));
+            }
+
+            .my-clock section:nth-of-type(10) {
+                -webkit-transform: rotateZ(calc(6deg * 10));
+                transform: rotateZ(calc(6deg * 10));
+            }
+
+            .my-clock section:nth-of-type(11) {
+                -webkit-transform: rotateZ(calc(6deg * 11));
+                transform: rotateZ(calc(6deg * 11));
+            }
+
+            .my-clock section:nth-of-type(12) {
+                -webkit-transform: rotateZ(calc(6deg * 12));
+                transform: rotateZ(calc(6deg * 12));
+            }
+
+            .my-clock section:nth-of-type(13) {
+                -webkit-transform: rotateZ(calc(6deg * 13));
+                transform: rotateZ(calc(6deg * 13));
+            }
+
+            .my-clock section:nth-of-type(14) {
+                -webkit-transform: rotateZ(calc(6deg * 14));
+                transform: rotateZ(calc(6deg * 14));
+            }
+
+            .my-clock section:nth-of-type(15) {
+                -webkit-transform: rotateZ(calc(6deg * 15));
+                transform: rotateZ(calc(6deg * 15));
+            }
+
+            .my-clock section:nth-of-type(16) {
+                -webkit-transform: rotateZ(calc(6deg * 16));
+                transform: rotateZ(calc(6deg * 16));
+            }
+
+            .my-clock section:nth-of-type(17) {
+                -webkit-transform: rotateZ(calc(6deg * 17));
+                transform: rotateZ(calc(6deg * 17));
+            }
+
+            .my-clock section:nth-of-type(18) {
+                -webkit-transform: rotateZ(calc(6deg * 18));
+                transform: rotateZ(calc(6deg * 18));
+            }
+
+            .my-clock section:nth-of-type(19) {
+                -webkit-transform: rotateZ(calc(6deg * 19));
+                transform: rotateZ(calc(6deg * 19));
+            }
+
+            .my-clock section:nth-of-type(20) {
+                -webkit-transform: rotateZ(calc(6deg * 20));
+                transform: rotateZ(calc(6deg * 20));
+            }
+
+            .my-clock section:nth-of-type(21) {
+                -webkit-transform: rotateZ(calc(6deg * 21));
+                transform: rotateZ(calc(6deg * 21));
+            }
+
+            .my-clock section:nth-of-type(22) {
+                -webkit-transform: rotateZ(calc(6deg * 22));
+                transform: rotateZ(calc(6deg * 22));
+            }
+
+            .my-clock section:nth-of-type(23) {
+                -webkit-transform: rotateZ(calc(6deg * 23));
+                transform: rotateZ(calc(6deg * 23));
+            }
+
+            .my-clock section:nth-of-type(24) {
+                -webkit-transform: rotateZ(calc(6deg * 24));
+                transform: rotateZ(calc(6deg * 24));
+            }
+
+            .my-clock section:nth-of-type(25) {
+                -webkit-transform: rotateZ(calc(6deg * 25));
+                transform: rotateZ(calc(6deg * 25));
+            }
+
+            .my-clock section:nth-of-type(26) {
+                -webkit-transform: rotateZ(calc(6deg * 26));
+                transform: rotateZ(calc(6deg * 26));
+            }
+
+            .my-clock section:nth-of-type(27) {
+                -webkit-transform: rotateZ(calc(6deg * 27));
+                transform: rotateZ(calc(6deg * 27));
+            }
+
+            .my-clock section:nth-of-type(28) {
+                -webkit-transform: rotateZ(calc(6deg * 28));
+                transform: rotateZ(calc(6deg * 28));
+            }
+
+            .my-clock section:nth-of-type(29) {
+                -webkit-transform: rotateZ(calc(6deg * 29));
+                transform: rotateZ(calc(6deg * 29));
+            }
+
+            .my-clock section:nth-of-type(30) {
+                -webkit-transform: rotateZ(calc(6deg * 30));
+                transform: rotateZ(calc(6deg * 30));
+            }
+
+            .my-clock section:nth-of-type(31) {
+                -webkit-transform: rotateZ(calc(6deg * 31));
+                transform: rotateZ(calc(6deg * 31));
+            }
+
+            .my-clock section:nth-of-type(32) {
+                -webkit-transform: rotateZ(calc(6deg * 32));
+                transform: rotateZ(calc(6deg * 32));
+            }
+
+            .my-clock section:nth-of-type(33) {
+                -webkit-transform: rotateZ(calc(6deg * 33));
+                transform: rotateZ(calc(6deg * 33));
+            }
+
+            .my-clock section:nth-of-type(34) {
+                -webkit-transform: rotateZ(calc(6deg * 34));
+                transform: rotateZ(calc(6deg * 34));
+            }
+
+            .my-clock section:nth-of-type(35) {
+                -webkit-transform: rotateZ(calc(6deg * 35));
+                transform: rotateZ(calc(6deg * 35));
+            }
+
+            .my-clock section:nth-of-type(36) {
+                -webkit-transform: rotateZ(calc(6deg * 36));
+                transform: rotateZ(calc(6deg * 36));
+            }
+
+            .my-clock section:nth-of-type(37) {
+                -webkit-transform: rotateZ(calc(6deg * 37));
+                transform: rotateZ(calc(6deg * 37));
+            }
+
+            .my-clock section:nth-of-type(38) {
+                -webkit-transform: rotateZ(calc(6deg * 38));
+                transform: rotateZ(calc(6deg * 38));
+            }
+
+            .my-clock section:nth-of-type(39) {
+                -webkit-transform: rotateZ(calc(6deg * 39));
+                transform: rotateZ(calc(6deg * 39));
+            }
+
+            .my-clock section:nth-of-type(40) {
+                -webkit-transform: rotateZ(calc(6deg * 40));
+                transform: rotateZ(calc(6deg * 40));
+            }
+
+            .my-clock section:nth-of-type(41) {
+                -webkit-transform: rotateZ(calc(6deg * 41));
+                transform: rotateZ(calc(6deg * 41));
+            }
+
+            .my-clock section:nth-of-type(42) {
+                -webkit-transform: rotateZ(calc(6deg * 42));
+                transform: rotateZ(calc(6deg * 42));
+            }
+
+            .my-clock section:nth-of-type(43) {
+                -webkit-transform: rotateZ(calc(6deg * 43));
+                transform: rotateZ(calc(6deg * 43));
+            }
+
+            .my-clock section:nth-of-type(44) {
+                -webkit-transform: rotateZ(calc(6deg * 44));
+                transform: rotateZ(calc(6deg * 44));
+            }
+
+            .my-clock section:nth-of-type(45) {
+                -webkit-transform: rotateZ(calc(6deg * 45));
+                transform: rotateZ(calc(6deg * 45));
+            }
+
+            .my-clock section:nth-of-type(46) {
+                -webkit-transform: rotateZ(calc(6deg * 46));
+                transform: rotateZ(calc(6deg * 46));
+            }
+
+            .my-clock section:nth-of-type(47) {
+                -webkit-transform: rotateZ(calc(6deg * 47));
+                transform: rotateZ(calc(6deg * 47));
+            }
+
+            .my-clock section:nth-of-type(48) {
+                -webkit-transform: rotateZ(calc(6deg * 48));
+                transform: rotateZ(calc(6deg * 48));
+            }
+
+            .my-clock section:nth-of-type(49) {
+                -webkit-transform: rotateZ(calc(6deg * 49));
+                transform: rotateZ(calc(6deg * 49));
+            }
+
+            .my-clock section:nth-of-type(50) {
+                -webkit-transform: rotateZ(calc(6deg * 50));
+                transform: rotateZ(calc(6deg * 50));
+            }
+
+            .my-clock section:nth-of-type(51) {
+                -webkit-transform: rotateZ(calc(6deg * 51));
+                transform: rotateZ(calc(6deg * 51));
+            }
+
+            .my-clock section:nth-of-type(52) {
+                -webkit-transform: rotateZ(calc(6deg * 52));
+                transform: rotateZ(calc(6deg * 52));
+            }
+
+            .my-clock section:nth-of-type(53) {
+                -webkit-transform: rotateZ(calc(6deg * 53));
+                transform: rotateZ(calc(6deg * 53));
+            }
+
+            .my-clock section:nth-of-type(54) {
+                -webkit-transform: rotateZ(calc(6deg * 54));
+                transform: rotateZ(calc(6deg * 54));
+            }
+
+            .my-clock section:nth-of-type(55) {
+                -webkit-transform: rotateZ(calc(6deg * 55));
+                transform: rotateZ(calc(6deg * 55));
+            }
+
+            .my-clock section:nth-of-type(56) {
+                -webkit-transform: rotateZ(calc(6deg * 56));
+                transform: rotateZ(calc(6deg * 56));
+            }
+
+            .my-clock section:nth-of-type(57) {
+                -webkit-transform: rotateZ(calc(6deg * 57));
+                transform: rotateZ(calc(6deg * 57));
+            }
+
+            .my-clock section:nth-of-type(58) {
+                -webkit-transform: rotateZ(calc(6deg * 58));
+                transform: rotateZ(calc(6deg * 58));
+            }
+
+            .my-clock section:nth-of-type(59) {
+                -webkit-transform: rotateZ(calc(6deg * 59));
+                transform: rotateZ(calc(6deg * 59));
+            }
+
+            .my-clock section:nth-of-type(60) {
+                -webkit-transform: rotateZ(calc(6deg * 60));
+                transform: rotateZ(calc(6deg * 60));
+            }
+
+        @-webkit-keyframes time {
+            to {
+                -webkit-transform: rotateZ(360deg);
+                transform: rotateZ(360deg);
+            }
+        }
+
+        @keyframes time {
+            to {
+                -webkit-transform: rotateZ(360deg);
+                transform: rotateZ(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <div class="my-clock">
+                <div class="clock">
+                    <div class="clock__second"></div>
+                    <div class="clock__minute"></div>
+                    <div class="clock__hour"></div>
+                    <div class="clock__axis"></div>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                    <section class="clock__indicator"></section>
+                </div>
+                <script>// Javascript is used to set the clock to your computer time.
+
+                    var currentSec = getSecondsToday();
+
+                    var seconds = (currentSec / 60) % 1;
+                    var minutes = (currentSec / 3600) % 1;
+                    var hours = (currentSec / 43200) % 1;
+
+                    setTime(60 * seconds, "second");
+                    setTime(3600 * minutes, "minute");
+                    setTime(43200 * hours, "hour");
+
+                    function setTime(left, hand) {
+                        $(".clock__" + hand).css("animation-delay", "" + left * -1 + "s");
+                    }
+
+                    function getSecondsToday() {
+                        let now = new Date();
+
+                        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+                        let diff = now - today;
+                        return Math.round(diff / 1000);
+                    }</script>
+            </div>
+            <div class="my-page">
+
+                <div class="box">
+                    <div class="box__ghost">
+                        <div class="symbol"></div>
+                        <div class="symbol"></div>
+                        <div class="symbol"></div>
+                        <div class="symbol"></div>
+                        <div class="symbol"></div>
+                        <div class="symbol"></div>
+
+                        <div class="box__ghost-container">
+                            <div class="box__ghost-eyes">
+                                <div class="box__eye-left"></div>
+                                <div class="box__eye-right"></div>
+                            </div>
+                            <div class="box__ghost-bottom">
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                        </div>
+                        <div class="box__ghost-shadow"></div>
+                    </div>
+
+                    <div class="box__description">
+                        <div class="box__description-container">
+                            <div class="box__description-title">Whoops!</div>
+                            <div class="box__description-text">It seems like we couldn't find the page you were looking for</div>
+                        </div>
+
+                        <a href="https://phanmemvas.vn/" class="box__button">Go back</a>
+
+                    </div>
+
+                </div>
+                <script>//based on https://dribbble.com/shots/3913847-404-page
+
+                    var pageX = $(document).width();
+                    var pageY = $(document).height();
+                    var mouseY = 0;
+                    var mouseX = 0;
+
+                    $(document).mousemove(function (event) {
+                        //verticalAxis
+                        mouseY = event.pageY;
+                        yAxis = (pageY / 2 - mouseY) / pageY * 300;
+                        //horizontalAxis
+                        mouseX = event.pageX / -pageX;
+                        xAxis = -mouseX * 100 - 100;
+
+                        $('.box__ghost-eyes').css({ 'transform': 'translate(' + xAxis + '%,-' + yAxis + '%)' });
+
+                        //console.log('X: ' + xAxis);
+
+                    });</script>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
