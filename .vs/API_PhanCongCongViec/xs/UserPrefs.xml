@@ -1,0 +1,14 @@
+﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{1F6B642A-9166-4828-B2A5-507C3B1B29A6}|Default">
+  <MonoDevelop.Ide.ItemProperties.API__PhanCongCongViec PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="API_PhanCongCongViec/Controllers/ProjectController.cs">
+    <Files>
+      <File FileName="API_PhanCongCongViec/Controllers/ProjectController.cs" Line="42" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
