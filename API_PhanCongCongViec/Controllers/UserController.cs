@@ -48,7 +48,8 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                DataTable list = Connect.GetTable(@"SELECT U.*, UT.name userType
+                DataTable list = Connect.GetTable(@"SELECT U.*, UT.name userType 
+                                                           , ( ISNULL(UT.name,'Chưa phân quyền') +' - '+ ISNULL(U.fullname,'') ) selectionName
                                                     FROM tb_USER U LEFT JOIN tb_User_Type UT ON U.userTypeID=UT.id ");
 
                 if (list != null)
