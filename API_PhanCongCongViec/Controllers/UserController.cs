@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using API_Tracy.Models;
 using API_Tracy.Providers;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,29 @@ namespace API_PhanCongCongViec.Controllers
         }
 
         [HttpGet]
+        public object getByTeamID(string teamID)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                if (teamID.Trim() != "")
+                {
+                    DataTable list = Connect.GetTable(@"
+                            SELECT TU.*, U.fullname
+                            FROM tb_TEAM_USER TU LEFT JOIN tb_USER U ON U.id=TU.userID
+                            WHERE TU.teamID IN
+                                        (select name from SplitString(@arr,',')) ", new string[1] { "@arr" }, new object[1] { teamID });
+
+                    if (list != null)
+                        response = new ResponseJson(list, false, "");
+                }
+            }
+
+            return response;
+        }
+
+        [HttpGet]
         public object getList()
         {
             ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
@@ -68,8 +92,6 @@ namespace API_PhanCongCongViec.Controllers
             {
                 if (Connect.Exec(@"delete from tb_USER where id=@id", new string[1] { "@id" }, new object[1] { id }))
                     response = new ResponseJson(null, false, "Đã xóa thành công !");
-                else
-                    response = new ResponseJson(null, true, "Đã có lỗi xảy ra !");
             }
 
             return response;

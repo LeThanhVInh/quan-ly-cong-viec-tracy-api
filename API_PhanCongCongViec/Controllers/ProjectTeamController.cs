@@ -1,0 +1,86 @@
+﻿using System;
+using System.Data;
+using System.Diagnostics;
+using API_Tracy.Models;
+using API_Tracy.Providers;
+using Microsoft.AspNetCore.Mvc;
+
+
+namespace API_PhanCongCongViec.Controllers
+{
+    [Route("[controller]/[action]")]
+    [ApiController]
+    public class ProjectTeamController : Controller
+    {
+        public object GetByProjectID(int projectID)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                DataTable item = Connect.GetTable(@"select * from tb_PROJECT_TEAM where projectID=@projectID",
+                    new string[1] { "@projectID" },
+                    new object[1] { projectID });
+                if (item != null)
+                    if (item.Rows.Count > 0)
+                        response = new ResponseJson(item, false, "");
+            }
+            return response;
+        }
+
+
+        [HttpDelete]
+        public object Delete(int teamID, int projectID)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Đã có lỗi xảy ra");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                if (Connect.Exec(@"delete from tb_PROJECT_TEAM where teamid=@teamID and projectID=@projectID",
+                    new string[2] { "@teamID", "@projectID" },
+                    new object[2] { teamID, projectID })
+                    )
+                    response = new ResponseJson(null, false, "Đã xóa thành công !");
+            }
+
+            return response;
+        }
+
+        [HttpPost]
+        public object insert([FromBody] dynamic item)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Đã có lỗi xảy ra");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                try
+                {
+                    if (item.teamID.ToString().Trim() == "" || item.projectID.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa nhập đủ thông tin !");
+                    else
+                    {
+                        if (Connect.Exec(@"INSERT INTO tb_PROJECT_TEAM(teamID,projectID)
+                                                       VALUES(@teamID, @projectID)"
+                                                    , new string[2] { "@teamID", "@projectID" }
+                                                    , new object[2] { item.teamID, item.projectID })
+                            )
+                            response = new ResponseJson(null, false, "Đã thêm thành công !");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Get stack trace for the exception with source file information
+                    var st = new StackTrace(ex, true);
+                    // Get the top stack frame
+                    var frame = st.GetFrame(st.FrameCount - 1);
+                    // Get the line number from the stack frame
+                    var line = frame.GetFileLineNumber();
+
+                    response = new ResponseJson(null, true, ex.Message + Environment.NewLine + "line: " + line);
+                }
+            }
+            return response;
+        }
+
+    }
+}

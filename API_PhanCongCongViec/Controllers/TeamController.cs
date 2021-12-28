@@ -55,8 +55,6 @@ namespace API_PhanCongCongViec.Controllers
             {
                 if (Connect.Exec(@"delete from tb_TEAM where id=@id", new string[1] { "@id" }, new object[1] { id }))
                     response = new ResponseJson(null, false, "Đã xóa thành công !");
-                else
-                    response = new ResponseJson(null, true, "Đã có lỗi xảy ra !");
             }
 
             return response;

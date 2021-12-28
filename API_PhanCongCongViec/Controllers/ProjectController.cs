@@ -55,7 +55,10 @@ namespace API_PhanCongCongViec.Controllers
                 int pageStart = pageNum * pageSize;
 
                 DataTable list = Connect.GetTable(@"
-                                    SELECT P.*, DE.name departmentName
+                                    SELECT P.*, DE.name departmentName ,
+                                            (select count(userID) from tb_PROJECT_MEMBER where projectID=P.id)
+                                            +
+                                            (select count(userID) from tb_PROJECT_MANAGER where projectID=P.id) memberAmount
                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
                                     ORDER BY P.id
                                     OFFSET " + pageStart + @" ROWS
@@ -64,6 +67,27 @@ namespace API_PhanCongCongViec.Controllers
                     response = new ResponseJson(list, false, "");
             }
 
+            return response;
+        }
+
+        [HttpGet]
+        public object GetMemberById(int id)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                DataTable item = Connect.GetTable(@"SELECT PM.userID, U.fullname, '0' tableStatus
+                                                    FROM tb_Project_MANAGER PM LEFT JOIN tb_User U ON U.id = PM.userID
+                                                    WHERE PM.projectID=@id
+                                              UNION
+                                                    SELECT PM.userID, U.fullname, '1' tableStatus
+                                                    FROM tb_Project_MEMBER PM LEFT JOIN tb_User U ON U.id = PM.userID
+                                                    WHERE PM.projectID=@id", new string[1] { "@id" }, new object[1] { id });
+                if (item != null)
+                    if (item.Rows.Count > 0)
+                        response = new ResponseJson(item, false, "");
+            }
             return response;
         }
 
@@ -76,8 +100,6 @@ namespace API_PhanCongCongViec.Controllers
             {
                 if (Connect.Exec(@"delete from tb_PROJECT where id=@id", new string[1] { "@id" }, new object[1] { id }))
                     response = new ResponseJson(null, false, "Đã xóa thành công !");
-                else
-                    response = new ResponseJson(null, true, "Không có dữ liệu !");
             }
 
             return response;
@@ -93,20 +115,65 @@ namespace API_PhanCongCongViec.Controllers
                 try
                 {
                     if (item.name.ToString().Trim() == "")
-                        response = new ResponseJson(null, true, "Chưa nhập Tên !");
+                        response = new ResponseJson(null, true, "Chưa nhập Tên dự án !");
+                    else if (item.managerID.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa chọn Người quản lý !");
+                    else if (item.memberID.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa chọn Người thực hiện !");
                     else
                     {
-                        if (Connect.Exec(@"INSERT INTO tb_PROJECT(name, startdate, enddate, isPriority, departmentID)
-                                           VALUES (@name, @startdate, @enddate, @isPriority, @departmentID ) ",
+                        object newID = Connect.FirstResulfExec(@"
+                                           INSERT INTO tb_PROJECT(name, startdate, enddate, isPriority, departmentID, description)
+                                           VALUES (@name, @startdate, @enddate, @isPriority, @departmentID, @description ) select SCOPE_IDENTITY() ",
 
-                                           new string[5] { "@name", "@startdate", "@enddate", "@isPriority", "@departmentID" },
-                                           new object[5] { item.name.ToString(),
-                                                           DateTime.Parse(item.startdate.ToString()),
-                                                           DateTime.Parse(item.enddate.ToString()),
+                                           new string[6] { "@name", "@startdate", "@enddate", "@isPriority", "@departmentID", "@description" },
+                                           new object[6] { item.name.ToString(),
+                                                           (item.startDate == null? Convert.DBNull : DateTime.Parse(item.startDate.ToString()) ),
+                                                           (item.endDate == null? Convert.DBNull : DateTime.Parse(item.endDate.ToString()) ),
                                                            bool.Parse(item.isPriority.ToString()),
-                                                           int.Parse(item.departmentID.ToString()) })
-                            )
+                                                           int.Parse(item.departmentID.ToString()),
+                                                           item.description.ToString() });
+                        if (newID != null)
+                        {
+                            {
+                                string[] managerID = (item.managerID.ToString() + ",").Split(',');
+                                for (int i = 0; i < managerID.Length; i++)
+                                {
+                                    if (managerID[i] != "")
+                                    {
+                                        Connect.Exec(@"INSERT INTO tb_PROJECT_MANAGER(userID,projectID)
+                                                       VALUES(@userID, @projectID)"
+                                                    , new string[2] { "@userID", "@projectID" }
+                                                    , new object[2] { managerID[i], newID });
+                                    }
+                                }
+                                ////////////////////////////////////////////////////////////////
+                                string[] teamID = (item.teamID.ToString() + ",").Split(',');
+                                for (int i = 0; i < teamID.Length; i++)
+                                {
+                                    if (teamID[i] != "")
+                                    {
+                                        Connect.Exec(@"INSERT INTO tb_PROJECT_TEAM(teamID,projectID)
+                                                       VALUES(@teamID, @projectID)"
+                                                    , new string[2] { "@teamID", "@projectID" }
+                                                    , new object[2] { teamID[i], newID });
+                                    }
+                                }
+                                ////////////////////////////////////////////////////////////////
+                                string[] memberID = (item.memberID.ToString() + ",").Split(',');
+                                for (int i = 0; i < memberID.Length; i++)
+                                {
+                                    if (memberID[i] != "")
+                                    {
+                                        Connect.Exec(@"INSERT INTO tb_PROJECT_MEMBER(userID,projectID)
+                                                       VALUES(@userID, @projectID)"
+                                                    , new string[2] { "@userID", "@projectID" }
+                                                    , new object[2] { memberID[i], newID });
+                                    }
+                                }
+                            }
                             response = new ResponseJson(null, false, "Đã thêm thành công !");
+                        }
                     }
                 }
                 catch (Exception ex)
