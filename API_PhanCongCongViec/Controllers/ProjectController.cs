@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using API_Tracy.Models;
 using API_Tracy.Providers;
 using Microsoft.AspNetCore.Mvc;
@@ -35,9 +37,10 @@ namespace API_PhanCongCongViec.Controllers
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
                 DataTable list = Connect.GetTable(@"SELECT P.*, DE.name departmentName
-                                                    FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id");
+                                                    FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
+                                                    ORDER BY ISNULL(P.isPriority,0) desc");
                 if (list != null)
-                    response = new ResponseJson(list, false, "t");
+                    response = new ResponseJson(list, false, "");
             }
 
             return response;
@@ -58,9 +61,9 @@ namespace API_PhanCongCongViec.Controllers
                                     SELECT P.*, DE.name departmentName ,
                                             (select count(userID) from tb_PROJECT_MEMBER where projectID=P.id)
                                             +
-                                            (select count(userID) from tb_PROJECT_MANAGER where projectID=P.id) memberAmount
+                                            (select 0 from tb_PROJECT_MANAGER where projectID=P.id) memberAmount
                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
-                                    ORDER BY P.id
+                                    ORDER BY ISNULL(P.isPriority,0) desc, P.id desc
                                     OFFSET " + pageStart + @" ROWS
                                     FETCH NEXT " + pageSize + @" ROWS ONLY;");
                 if (list != null)
@@ -116,6 +119,8 @@ namespace API_PhanCongCongViec.Controllers
                 {
                     if (item.name.ToString().Trim() == "")
                         response = new ResponseJson(null, true, "Chưa nhập Tên dự án !");
+                    else if (item.departmentID.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa chọn Phòng ban !");
                     else if (item.managerID.ToString().Trim() == "")
                         response = new ResponseJson(null, true, "Chưa chọn Người quản lý !");
                     else if (item.memberID.ToString().Trim() == "")
@@ -172,6 +177,10 @@ namespace API_PhanCongCongViec.Controllers
                                     }
                                 }
                             }
+                            {
+                                Connect.Exec(@"INSERT INTO tb_Task_Group(projectID,name)
+                                               VALUES(@id, N'Nhóm chưa đặt tên') ", new string[] { "@id" }, new object[] { newID });
+                            }
                             response = new ResponseJson(null, false, "Đã thêm thành công !");
                         }
                     }
@@ -202,6 +211,10 @@ namespace API_PhanCongCongViec.Controllers
                 {
                     if (item.name.ToString().Trim() == "")
                         response = new ResponseJson(null, true, "Chưa nhập Tên !");
+                    else if (item.departmentID.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa chọn Phòng ban !");
+                    else if (item.managerID.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa chọn Người quản lý !");
                     else
                     {
                         if (Connect.Exec(@"UPDATE tb_PROJECT
@@ -214,13 +227,39 @@ namespace API_PhanCongCongViec.Controllers
                                        WHERE id = @id ",
                                            new string[6] { "@name", "@startdate", "@enddate", "@isPriority", "@departmentID", "@id" },
                                            new object[6] { item.name.ToString(),
-                                                           DateTime.Parse(item.startdate.ToString()),
-                                                           DateTime.Parse(item.enddate.ToString()),
+                                                           (item.startDate == null? Convert.DBNull : DateTime.Parse(item.startDate.ToString()) ),
+                                                           (item.endDate == null? Convert.DBNull : DateTime.Parse(item.endDate.ToString()) ),
                                                            bool.Parse(item.isPriority.ToString()),
                                                            int.Parse(item.departmentID.ToString()),
                                                            int.Parse(item.id.ToString()) })
                             )
                         {
+                            #region Update Project Member
+                            string[] memberID = Connect.GetTable(@"select userID from tb_Project_Member where projectID=@id ", new string[1] { "@id" }, new object[1] { int.Parse(item.id.ToString()) }).Rows.OfType<DataRow>().Select(k => k[0].ToString()).ToArray();
+                            string[] member_delete = FindItemNotExist(memberID, item.memberID.ToString().Split(','));
+                            string[] member_insert = FindItemNotExist(item.memberID.ToString().Split(','), memberID);
+
+                            for (int i = 0; i < member_insert.Length; i++)
+                            {
+                                if (member_insert[i] != "")
+                                {
+                                    Connect.Exec(@"INSERT INTO tb_PROJECT_MEMBER(userID,projectID)
+                                                       VALUES(@userID, @projectID)"
+                                                , new string[2] { "@userID", "@projectID" }
+                                                , new object[2] { member_insert[i], int.Parse(item.id.ToString()) });
+                                }
+                            }
+                            for (int i = 0; i < member_delete.Length; i++)
+                            {
+                                if (member_delete[i] != "")
+                                {
+                                    Connect.Exec(@" Delete tb_Project_Member where userID=@userID and projectID=@projectID "
+                                                , new string[2] { "@userID", "@projectID" }
+                                                , new object[2] { member_delete[i], int.Parse(item.id.ToString()) });
+                                }
+                            }
+                            #endregion
+
                             response = new ResponseJson(null, false, "Đã cập nhật thành công !");
                         }
                         else
@@ -240,6 +279,17 @@ namespace API_PhanCongCongViec.Controllers
                 }
             }
             return response;
+        }
+
+        string[] FindItemNotExist(string[] arrA, string[] arrB)
+        {
+            List<string> result = new List<string>();
+            foreach (var item in arrA)
+            {
+                if (!arrB.Contains(item))
+                    result.Add(item);
+            }
+            return result.ToArray();
         }
     }
 }

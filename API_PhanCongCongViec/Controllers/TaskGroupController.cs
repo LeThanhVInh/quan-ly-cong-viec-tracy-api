@@ -10,7 +10,7 @@ namespace API_PhanCongCongViec.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]
-    public class TeamController : Controller
+    public class TaskGroupController : Controller
     {
         public object GetById(int id)
         {
@@ -18,7 +18,7 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                DataTable item = Connect.GetTable(@"select * from tb_TEAM where id=@id", new string[1] { "@id" }, new object[1] { id });
+                DataTable item = Connect.GetTable(@"select * from tb_Task_Group where id=@id", new string[1] { "@id" }, new object[1] { id });
                 if (item != null)
                     if (item.Rows.Count > 0)
                         response = new ResponseJson(item, false, "");
@@ -27,16 +27,24 @@ namespace API_PhanCongCongViec.Controllers
         }
 
         [HttpGet]
-        public object getList()
+        public object getListByProjectID(int id, int pageNum, int pageSize)
         {
             ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
+                pageNum -= 1;
+                if (pageNum <= 0) pageNum = 0;
+                int pageStart = pageNum * pageSize;
+
                 DataTable list = Connect.GetTable(@"
-                            SELECT T.* ,
-                               (select count(userID) from tb_Team_User where teamid=T.id) memberAmount
-                            FROM tb_TEAM T ");
+                                    SELECT * FROM tb_Task_Group TG
+                                    WHERE projectID=@id 
+                                    ORDER BY TG.id desc
+                                    OFFSET " + pageStart + @" ROWS
+                                    FETCH NEXT " + pageSize + @" ROWS ONLY;",
+                                                new string[1] { "@id" },
+                                                new object[1] { id });
 
                 if (list != null)
                     response = new ResponseJson(list, false, "");
@@ -52,7 +60,7 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                if (Connect.Exec(@"delete from tb_TEAM where id=@id", new string[1] { "@id" }, new object[1] { id }))
+                if (Connect.Exec(@"delete from tb_Task_Group where id=@id", new string[1] { "@id" }, new object[1] { id }))
                     response = new ResponseJson(null, false, "Đã xóa thành công !");
             }
 
@@ -72,21 +80,11 @@ namespace API_PhanCongCongViec.Controllers
                         response = new ResponseJson(null, true, "Chưa nhập Tên !");
                     else
                     {
-                        object newID = Connect.FirstResulfExec(@"INSERT INTO tb_TEAM(name) VALUES (@name ) select SCOPE_IDENTITY()",
-                            new string[1] { "@name" }, new object[1] { item.name.ToString() });
-                        if (newID != null)
-                        {
-                            if (item.userID.ToString() != "" && item.userID.ToString().Contains(","))
-                            {
-                                string[] id_array = item.userID.ToString().Split(",");
-                                foreach (var userID in id_array)
-                                {
-                                    if (userID != "")
-                                        StaticClass.InsertUserTeam(response, userID, newID.ToString());
-                                }
-                            }
+                        if (Connect.Exec(@"INSERT INTO tb_Task_Group(name, description, projectID)
+                                       VALUES (@name, @description ,@projectID ) ",
+                                       new string[3] { "@name", "@description", "@projectID" },
+                                       new object[3] { item.name.ToString(), item.description.ToString(), int.Parse(item.projectID.ToString()) }))
                             response = new ResponseJson(null, false, "Đã thêm thành công !");
-                        }
                     }
                 }
                 catch (Exception ex)
@@ -117,21 +115,14 @@ namespace API_PhanCongCongViec.Controllers
                         response = new ResponseJson(null, true, "Chưa nhập Tên !");
                     else
                     {
-                        if (Connect.Exec(@"UPDATE tb_TEAM
+                        if (Connect.Exec(@"UPDATE tb_Task_Group
                                         SET
-                                            name = @name 
-                                       WHERE id = @id ", new string[2] { "@name", "@id" }, new object[2] { item.name.ToString(), int.Parse(item.id.ToString()) }))
+                                            name = @name
+                                           ,description = @description 
+                                       WHERE id = @id ",
+                                       new string[3] { "@name", "@description", "@id" },
+                                       new object[3] { item.name.ToString(), item.description.ToString(), int.Parse(item.id.ToString()) }))
                         {
-                            if (item.userID.ToString() != "" && item.userID.ToString().Contains(","))
-                            {
-                                string[] id_array = item.userID.ToString().Split(",");
-                                foreach (var userID in id_array)
-                                {
-                                    if (userID != "")
-                                        StaticClass.InsertUserTeam(response, userID, item.id.ToString());
-                                }
-                            }
-
                             response = new ResponseJson(null, false, "Đã cập nhật thành công !");
                         }
                         else

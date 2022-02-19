@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
@@ -19,8 +20,9 @@ namespace API_Tracy.Providers
                 string accessToken = headers["access-token"].ToString();
                 string username = headers["username"].ToString();
 
-                string tokenUsername = TokenManager.ValidateToken(accessToken);
-                if (username == tokenUsername)
+                string[] token_output = TokenManager.ValidateToken(accessToken);
+                string username_output = TokenManager.ValidateToken(username)[0];
+                if (username_output.Equals(token_output[0]) && DateTime.Now < DateTime.Parse(token_output[1]))
                     result = true;
             }
             return result;

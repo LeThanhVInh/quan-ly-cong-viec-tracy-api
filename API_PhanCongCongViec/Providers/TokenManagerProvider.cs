@@ -12,13 +12,14 @@ namespace TokenManagerProvider
         {
             byte[] key = Convert.FromBase64String(Secret);
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
+            DateTime dateExpired = DateTime.Now.AddDays(3);
             SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
-                      new Claim(ClaimTypes.Name, username)}),
-                Expires = DateTime.Now.AddDays(3),
-                SigningCredentials = new SigningCredentials(securityKey,
-                SecurityAlgorithms.HmacSha256Signature)
+                      new Claim(ClaimTypes.Name, username),
+                      new Claim(ClaimTypes.Expired, dateExpired.ToString("MM/dd/yyyy HH:mm:ss"))}),
+                Expires = dateExpired,
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
             };
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
@@ -50,9 +51,10 @@ namespace TokenManagerProvider
                 return null;
             }
         }
-        public static string ValidateToken(string token)
+
+        public static string[] ValidateToken(string token)
         {
-            string username = null;
+            string username = null, datetime = null;
             ClaimsPrincipal principal = GetPrincipal(token);
             if (principal == null)
                 return null;
@@ -65,9 +67,11 @@ namespace TokenManagerProvider
             {
                 return null;
             }
-            Claim usernameClaim = identity.FindFirst(ClaimTypes.Name);
-            username = usernameClaim.Value;
-            return username;
+            Claim claim = identity.FindFirst(ClaimTypes.Name);
+            username = claim.Value;
+            Claim claim2 = identity.FindFirst(ClaimTypes.Expired);
+            datetime = claim2.Value;
+            return new[] { username, datetime };
         }
 
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Diagnostics;
-using API_PhanCongCongViec.Models;
 using API_Tracy.Models;
 using API_Tracy.Providers;
 using Microsoft.AspNetCore.Mvc;

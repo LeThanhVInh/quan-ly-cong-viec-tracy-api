@@ -34,6 +34,7 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
+                username = TokenManagerProvider.TokenManager.ValidateToken(username)[0];
                 DataTable fullname = Connect.GetTable(@"select fullname from tb_User where username=@username", new string[1] { "@username" }, new object[1] { username });
                 if (fullname != null)
                     response = new ResponseJson(fullname.Rows[0][0], false, "");

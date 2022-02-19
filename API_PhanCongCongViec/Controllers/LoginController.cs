@@ -1,4 +1,5 @@
-﻿using API_Tracy.Models;
+﻿using System;
+using API_Tracy.Models;
 using Microsoft.AspNetCore.Mvc;
 using TokenManagerProvider;
 
@@ -25,8 +26,9 @@ namespace API_PhanCongCongViec.Controllers
                     if (Pass.ToString() == login.password.ToString())
                     {
                         var token = TokenManager.GenerateToken(login.username.ToString());
+                        var username = TokenManager.GenerateToken(login.username.ToString());
 
-                        response = new ResponseJson(token, false, "Đăng nhập thành công");
+                        response = new ResponseJson(new string[] { token, username }, false, "Đăng nhập thành công");
                     }
                     else
                         response = new ResponseJson(null, true, "Sai mật khẩu !");
@@ -40,20 +42,24 @@ namespace API_PhanCongCongViec.Controllers
         public object Validate(string token, string username)
         {
             ResponseJson response = null;
-
-            object user = Connect.getField("tb_User", "username", "username", username);
-            if (user == null)
-                response = new ResponseJson(null, true, "Không có dữ liệu !");
-            else
+            try
             {
-                string tokenUsername = TokenManager.ValidateToken(token);
-                if (username.Equals(tokenUsername))
-                {
-                    response = new ResponseJson(null, false, "Thành công !");
-                }
+                string username_output = TokenManager.ValidateToken(username)[0];
+                object user = Connect.getField("tb_User", "username", "username", username_output);
+                if (user == null)
+                    response = new ResponseJson(null, true, "Không có dữ liệu !");
                 else
-                    response = new ResponseJson(null, true, "Đã hết phiên đăng nhập");
+                {
+                    string[] token_output = TokenManager.ValidateToken(token);
+                    if (username_output.Equals(token_output[0]) && DateTime.Now < DateTime.Parse(token_output[1]))
+                    {
+                        response = new ResponseJson(null, false, "Thành công !");
+                    }
+                    else
+                        response = new ResponseJson(null, true, "Đã hết phiên đăng nhập");
+                }
             }
+            catch { }
             return response;
         }
 

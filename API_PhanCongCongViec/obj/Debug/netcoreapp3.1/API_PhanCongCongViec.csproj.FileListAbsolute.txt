@@ -16,6 +16,12 @@
 /Users/vinharnold/Desktop/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.dll
 /Users/vinharnold/Desktop/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.pdb
 /Users/vinharnold/Desktop/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.genruntimeconfig.cache
+/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.GeneratedMSBuildEditorConfig.editorconfig
+/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.AssemblyInfoInputs.cache
+/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.AssemblyInfo.cs
+/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.csproj.CoreCompileInputs.cache
+/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.MvcApplicationPartsAssemblyInfo.cs
+/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.MvcApplicationPartsAssemblyInfo.cache
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/bin/Debug/netcoreapp3.1/appsettings.Development.json
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/bin/Debug/netcoreapp3.1/appsettings.json
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/bin/Debug/netcoreapp3.1/API_PhanCongCongViec.deps.json
@@ -46,12 +52,6 @@
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp2.1/System.Data.SqlClient.dll
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/bin/Debug/netcoreapp3.1/runtimes/unix/lib/netcoreapp3.1/System.Drawing.Common.dll
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp3.1/System.Drawing.Common.dll
-/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.GeneratedMSBuildEditorConfig.editorconfig
-/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.AssemblyInfoInputs.cache
-/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.AssemblyInfo.cs
-/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.csproj.CoreCompileInputs.cache
-/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.MvcApplicationPartsAssemblyInfo.cs
-/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.MvcApplicationPartsAssemblyInfo.cache
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/staticwebassets/API_PhanCongCongViec.StaticWebAssets.Manifest.cache
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.RazorTargetAssemblyInfo.cache
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.csproj.CopyComplete
