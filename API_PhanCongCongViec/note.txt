@@ -1,4 +1,5 @@
 ﻿có 3 trạng thái công việc:
- + 0 : Đang làm, chưa xong
+ + 0 : Đang làm (chưa trễ, đã trễ, gần hết hạn)
  + 1 : Đã hoàn thành
  + 2 : Thất bại
+ + 3 : Đang chờ

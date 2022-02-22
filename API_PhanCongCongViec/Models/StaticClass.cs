@@ -3,26 +3,31 @@ using API_Tracy.Models;
 
 public static class StaticClass
 {
-    public static string sqlGetTaskStatus = @"CASE WHEN isFinished = 2
-                                                 THEN N'Thất bại_brown'
-                                                 ELSE
-                                                    CASE WHEN enddate < GETDATE()
-                                                           THEN 
-                                                                CASE WHEN finishPercent = 100
-                                                                    THEN N'Đã hoàn thành_green'
-                                                                    ELSE N'Đã hết hạn_red'
-                                                                END
-                                                           ELSE
-                                                                CASE WHEN finishPercent = 100
-                                                                  THEN N'Đã hoàn thành_green'
-                                                                  ELSE
-                                                                    CASE WHEN DATEDIFF(DAY, GETDATE(), enddate) <= 3
-                                                                        THEN N'Sắp hết hạn ('+ CAST(DATEDIFF(DAY, GETDATE(), enddate) as nvarchar) +')_orange'
-                                                                        ELSE N'Đang làm_yellow'
-                                                                    END
-                                                                END
-                                                    END
-                                            END as 'status'";
+    public static string sqlGetTaskStatus = @"
+                       CASE WHEN T.isFinished = 2
+                            THEN N'Thất bại_brown'
+                            ELSE
+                               CASE WHEN DATEDIFF(DAY, T.startdate ,GETDATE()) < 0 and T.isFinished = 3
+                                    THEN N'Đang chờ_purple'
+                                    ELSE
+                                       CASE WHEN T.enddate < GETDATE()
+                                              THEN 
+                                                   CASE WHEN T.finishPercent = 100
+                                                       THEN N'Đã hoàn thành_green'
+                                                       ELSE N'Đã hết hạn_red'
+                                                   END
+                                              ELSE
+                                                   CASE WHEN T.finishPercent = 100
+                                                     THEN N'Đã hoàn thành_green'
+                                                     ELSE
+                                                       CASE WHEN DATEDIFF(DAY, GETDATE(), T.enddate) <= 3
+                                                           THEN N'Sắp hết hạn ('+ CAST(DATEDIFF(DAY, GETDATE(), T.enddate) as nvarchar) +')_orange'
+                                                           ELSE N'Đang làm_yellow'
+                                                       END
+                                                   END
+                                       END
+                               END
+                       END as 'status'";
 
     public static ResponseJson InsertUserTeam(ResponseJson response, string userID, string teamID)
     {

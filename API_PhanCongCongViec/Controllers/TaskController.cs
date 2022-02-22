@@ -28,8 +28,10 @@ namespace API_PhanCongCongViec.Controllers
                                             FROM tb_Task_Member TM LEFT JOIN tb_User U ON U.id=TM.userID
                                             WHERE TM.taskID=T.id
                                            ) memberName,
+                                            TG.name TaskGroupName,
                                             " + StaticClass.sqlGetTaskStatus + @"
                                     FROM tb_Task T
+                                                    LEFT JOIN tb_Task_Group TG ON TG.id=T.taskgroupID
                                     WHERE T.id=@id", new string[1] { "@id" }, new object[1] { id });
                 if (item != null)
                     if (item.Rows.Count > 0)
@@ -46,7 +48,7 @@ namespace API_PhanCongCongViec.Controllers
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
                 DataTable item = Connect.GetTable(@"
-                                        SELECT * , U.fullname CreatorName , " + StaticClass.sqlGetTaskStatus + @" ,
+                                        SELECT T.* , U.fullname CreatorName , " + StaticClass.sqlGetTaskStatus + @" ,
                                                 (select top 1 U2.fullname
                                                  from tb_Task_Member TM LEFT JOIN tb_User U2 ON  U2.id=TM.userID
                                                  where TM.taskID=T.id
@@ -122,9 +124,15 @@ namespace API_PhanCongCongViec.Controllers
                     {
                         string username_output = TokenManagerProvider.TokenManager.ValidateToken(Request.Headers["username"].ToString())[0];
                         string creatorID = (Connect.getField("tb_USER", "id", "username", username_output) ?? "").ToString();
+
+                        int isFinished = 0;
+                        if (item.startDate != null)
+                            if (DateTime.Parse(item.startDate.ToString()) > DateTime.Now)
+                                isFinished = 3;
+
                         object newID = Connect.FirstResulfExec(@"
                                     INSERT INTO tb_Task(name, description, taskGroupID, userCreateID, isActive, isFinished, startdate, enddate)
-                                    VALUES (@name, @description, @taskGroupID, @userCreateID, 0, 0, @startdate, @enddate ) select SCOPE_IDENTITY()",
+                                    VALUES (@name, @description, @taskGroupID, @userCreateID, 0, " + isFinished + @", @startdate, @enddate ) select SCOPE_IDENTITY()",
                                           new string[6] { "@name", "@description", "@taskGroupID", "@userCreateID", "@startdate", "@enddate" },
                                           new object[6] { item.name.ToString(),
                                                           item.description.ToString(),
@@ -184,6 +192,11 @@ namespace API_PhanCongCongViec.Controllers
                         response = new ResponseJson(null, true, "Chưa chọn Người thực hiện !");
                     else
                     {
+                        int isFinished = int.Parse(((Connect.getField("tb_Task", "ISNULL(isFinished,0)", "id", int.Parse(item.id.ToString()))) ?? "0").ToString());
+                        if (item.startDate != null)
+                            if (DateTime.Parse(item.startDate.ToString()) > DateTime.Now)
+                                isFinished = 3;
+
                         if (Connect.Exec(@"UPDATE tb_Task
                                         SET
                                             name = @name
@@ -191,6 +204,7 @@ namespace API_PhanCongCongViec.Controllers
                                           , taskGroupID  = @taskGroupID
                                           , startdate = @startdate
                                           , enddate = @enddate
+                                          , isFinished = " + isFinished + @"
                                        WHERE id = @id ",
                                        new string[6] { "@name", "@description", "@taskGroupID", "@startdate", "@enddate", "@id" },
                                        new object[6] { item.name.ToString(),

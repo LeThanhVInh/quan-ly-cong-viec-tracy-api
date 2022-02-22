@@ -1,22 +1,12 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{1F6B642A-9166-4828-B2A5-507C3B1B29A6}|Default">
   <MonoDevelop.Ide.ItemProperties.API__PhanCongCongViec PreferredExecutionTarget="/Applications/CocCoc.app" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="API_PhanCongCongViec/Controllers/CalendarController.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="API_PhanCongCongViec/Controllers/TaskController.cs" Line="40" Column="1" />
-      <File FileName="API_PhanCongCongViec/Controllers/CalendarController.cs" Line="64" Column="30" />
+      <File FileName="API_PhanCongCongViec/Controllers/TaskController.cs" Line="119" Column="58" />
     </Files>
     <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="API_PhanCongCongViec" expanded="True">
-            <Node name="API_PhanCongCongViec" expanded="True">
-              <Node name="Controllers" expanded="True">
-                <Node name="CalendarController.cs" selected="True" />
-              </Node>
-              <Node name="Models" expanded="True" />
-            </Node>
-          </Node>
-        </State>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

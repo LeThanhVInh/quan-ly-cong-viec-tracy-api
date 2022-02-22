@@ -36,13 +36,90 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                DataTable list = Connect.GetTable(@"SELECT P.*, DE.name departmentName
-                                                    FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
-                                                    ORDER BY ISNULL(P.isPriority,0) desc");
+                DataTable list = Connect.GetTable(@"
+                                        SELECT P.*, DE.name departmentName 
+                                    FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
+                                    ORDER BY ISNULL(P.isPriority,0) desc");
                 if (list != null)
                     response = new ResponseJson(list, false, "");
             }
 
+            return response;
+        }
+
+        [HttpGet]
+        public object getMemberStatisticById(int id)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                DataTable item = Connect.GetTable(@"
+                                SELECT tb_Member.* ,
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                                                           LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
+                                         where TG.projectID=tb_Member.projectID 
+                                               and TM.userID=tb_Member.userID
+                                        ) TotalTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
+                                         where TG.projectID=tb_Member.projectID 
+                                               and TM.userID=tb_Member.userID 
+                                               and T.enddate < GETDATE() 
+                                               and T.finishPercent < 100
+                                               and T.isFinished = 0
+                                        ) LateTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
+                                         where TG.projectID=tb_Member.projectID 
+                                               and TM.userID=tb_Member.userID 
+                                               and DATEDIFF(DAY, GETDATE(), T.enddate ) > 0
+                                               and T.isFinished = 0
+                                        ) ProcessingTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
+                                         where TG.projectID=tb_Member.projectID 
+                                               and TM.userID=tb_Member.userID 
+                                               and T.finishPercent=100 
+                                               and T.isFinished=1 
+                                        ) AccomplishedTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
+                                         where TG.projectID=tb_Member.projectID 
+                                               and TM.userID=tb_Member.userID 
+                                               and T.isFinished = 2
+                                        ) FailedTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
+                                         where TG.projectID=tb_Member.projectID 
+                                               and TM.userID=tb_Member.userID 
+                                               and DATEDIFF(DAY, T.startdate ,GETDATE()) < 0 
+                                               and T.isFinished = 3
+                                        ) WaitingTask
+                                        ------------------------------------------------------------------------------------
+                                FROM 
+                                    (
+                                        SELECT U.fullname,U.id userID, TG.projectID
+                                        FROM tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
+                                                    LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
+                                                    LEFT JOIN tb_USER U ON U.id=TM.userID
+                                        WHERE TG.projectID=@id
+                                        GROUP BY U.fullname, U.id, TG.projectID
+                                    ) as tb_Member", new string[1] { "@id" }, new object[1] { id });
+                if (item != null)
+                    if (item.Rows.Count > 0)
+                        response = new ResponseJson(item, false, "");
+            }
             return response;
         }
 
@@ -62,6 +139,47 @@ namespace API_PhanCongCongViec.Controllers
                                             (select count(userID) from tb_PROJECT_MEMBER where projectID=P.id)
                                             +
                                             (select 0 from tb_PROJECT_MANAGER where projectID=P.id) memberAmount
+,
+                                        ------------------------------------------------------------------------------------
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id  
+                                         where TG.projectID=P.id  
+                                        ) TotalTask ,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                         where TG.projectID= P.id
+                                               and T.enddate < GETDATE() 
+                                               and T.finishPercent < 100
+                                               and T.isFinished = 0
+                                        ) LateTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
+                                         where TG.projectID= P.id 
+                                               and DATEDIFF(DAY, GETDATE(), T.enddate ) > 0
+                                               and T.isFinished = 0
+                                        ) ProcessingTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
+                                         where TG.projectID= P.id
+                                               and T.finishPercent=100 
+                                               and T.isFinished=1 
+                                        ) AccomplishedTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                         where TG.projectID= P.id
+                                               and T.isFinished = 2
+                                        ) FailedTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
+                                         from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                         where TG.projectID= P.id
+                                               and DATEDIFF(DAY, T.startdate ,GETDATE()) < 0 
+                                               and T.isFinished = 3
+                                        ) WaitingTask
+                                        ------------------------------------------------------------------------------------
                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
                                     ORDER BY ISNULL(P.isPriority,0) desc, P.id desc
                                     OFFSET " + pageStart + @" ROWS
@@ -70,6 +188,57 @@ namespace API_PhanCongCongViec.Controllers
                     response = new ResponseJson(list, false, "");
             }
 
+            return response;
+        }
+
+        [HttpGet]
+        public object GetStatisticById(int id)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                DataTable item = Connect.GetTable(@"
+                                    SELECT
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                         where TG.projectID=P.id 
+                                        ) TotalTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                         where TG.projectID=P.id and T.enddate < GETDATE() 
+                                            and T.finishPercent < 100
+                                            and T.isFinished = 0
+                                        ) LateTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
+                                         where TG.projectID=P.id 
+                                            and DATEDIFF(DAY, GETDATE(), T.enddate ) > 0
+                                            and T.isFinished = 0
+                                        ) ProcessingTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
+                                         where TG.projectID=P.id 
+                                            and T.finishPercent=100 
+                                            and T.isFinished=1 
+                                        ) AccomplishedTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                         where TG.projectID=P.id 
+                                            and T.isFinished = 2
+                                        ) FailedTask,
+                                        ------------------------------------------------------------------------------------
+                                        (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
+                                         where TG.projectID=P.id 
+                                            and DATEDIFF(DAY, T.startdate ,GETDATE()) < 0 
+                                            and T.isFinished = 3
+                                        ) WaitingTask
+                                        ------------------------------------------------------------------------------------
+                                    FROM tb_PROJECT P
+                                    WHERE P.id=@id", new string[1] { "@id" }, new object[1] { id });
+                if (item != null)
+                    if (item.Rows.Count > 0)
+                        response = new ResponseJson(item, false, "");
+            }
             return response;
         }
 
