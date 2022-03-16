@@ -3,3 +3,8 @@
  + 1 : Đã hoàn thành
  + 2 : Thất bại
  + 3 : Đang chờ
+
+có 3 mã loại nhân viên :
++ Administrator
++ ProjectMananger
++ Member

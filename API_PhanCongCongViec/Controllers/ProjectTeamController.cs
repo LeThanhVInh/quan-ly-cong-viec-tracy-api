@@ -18,12 +18,16 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                DataTable item = Connect.GetTable(@"select * from tb_PROJECT_TEAM where projectID=@projectID",
-                    new string[1] { "@projectID" },
-                    new object[1] { projectID });
-                if (item != null)
-                    if (item.Rows.Count > 0)
-                        response = new ResponseJson(item, false, "");
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator" || author == "ProjectManager")
+                {
+                    DataTable item = Connect.GetTable(@"select * from tb_PROJECT_TEAM where projectID=@projectID",
+                        new string[1] { "@projectID" },
+                        new object[1] { projectID });
+                    if (item != null)
+                        if (item.Rows.Count > 0)
+                            response = new ResponseJson(item, false, "");
+                }
             }
             return response;
         }
@@ -36,11 +40,15 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                if (Connect.Exec(@"delete from tb_PROJECT_TEAM where teamid=@teamID and projectID=@projectID",
-                    new string[2] { "@teamID", "@projectID" },
-                    new object[2] { teamID, projectID })
-                    )
-                    response = new ResponseJson(null, false, "Đã xóa thành công !");
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator")
+                {
+                    if (Connect.Exec(@"delete from tb_PROJECT_TEAM where teamid=@teamID and projectID=@projectID",
+                        new string[2] { "@teamID", "@projectID" },
+                        new object[2] { teamID, projectID })
+                        )
+                        response = new ResponseJson(null, false, "Đã xóa thành công !");
+                }
             }
 
             return response;
@@ -55,16 +63,20 @@ namespace API_PhanCongCongViec.Controllers
             {
                 try
                 {
-                    if (item.teamID.ToString().Trim() == "" || item.projectID.ToString().Trim() == "")
-                        response = new ResponseJson(null, true, "Chưa nhập đủ thông tin !");
-                    else
+                    string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                    if (author == "Administrator" || author == "ProjectManager")
                     {
-                        if (Connect.Exec(@"INSERT INTO tb_PROJECT_TEAM(teamID,projectID)
+                        if (item.teamID.ToString().Trim() == "" || item.projectID.ToString().Trim() == "")
+                            response = new ResponseJson(null, true, "Chưa nhập đủ thông tin !");
+                        else
+                        {
+                            if (Connect.Exec(@"INSERT INTO tb_PROJECT_TEAM(teamID,projectID)
                                                        VALUES(@teamID, @projectID)"
-                                                    , new string[2] { "@teamID", "@projectID" }
-                                                    , new object[2] { item.teamID, item.projectID })
-                            )
-                            response = new ResponseJson(null, false, "Đã thêm thành công !");
+                                                        , new string[2] { "@teamID", "@projectID" }
+                                                        , new object[2] { item.teamID, item.projectID })
+                                )
+                                response = new ResponseJson(null, false, "Đã thêm thành công !");
+                        }
                     }
                 }
                 catch (Exception ex)

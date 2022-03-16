@@ -10,7 +10,7 @@ namespace API_PhanCongCongViec.Controllers
 {
     [Route("[controller]/[action]")]
     [ApiController]
-    public class DepartmentController : Controller
+    public class ProcedureController : Controller
     {
         public object GetById(int id)
         {
@@ -21,7 +21,7 @@ namespace API_PhanCongCongViec.Controllers
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 if (author == "Administrator")
                 {
-                    DataTable item = Connect.GetTable(@"select * from tb_department where id=@id", new string[1] { "@id" }, new object[1] { id });
+                    DataTable item = Connect.GetTable(@"select * from tb_procedure where id=@id", new string[1] { "@id" }, new object[1] { id });
                     if (item != null)
                         if (item.Rows.Count > 0)
                             response = new ResponseJson(item, false, "");
@@ -40,7 +40,8 @@ namespace API_PhanCongCongViec.Controllers
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 if (author == "Administrator" || author == "ProjectManager")
                 {
-                    DataTable list = Connect.GetTable(@"select * from tb_department");
+                    DataTable list = Connect.GetTable(@"select * from tb_procedure");
+
                     if (list != null)
                         response = new ResponseJson(list, false, "");
                 }
@@ -59,7 +60,7 @@ namespace API_PhanCongCongViec.Controllers
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 if (author == "Administrator")
                 {
-                    if (Connect.Exec(@"delete from tb_department where id=@id", new string[1] { "@id" }, new object[1] { id }))
+                    if (Connect.Exec(@"delete from tb_procedure where id=@id", new string[1] { "@id" }, new object[1] { id }))
                         response = new ResponseJson(null, false, "Đã xóa thành công !");
                 }
             }
@@ -83,9 +84,11 @@ namespace API_PhanCongCongViec.Controllers
                             response = new ResponseJson(null, true, "Chưa nhập Tên !");
                         else
                         {
-                            if (Connect.Exec(@"INSERT INTO tb_DEPARTMENT(name)
-                                       VALUES (@name ) ", new string[1] { "@name" }, new object[1] { item.name.ToString() }))
-                                response = new ResponseJson(null, false, "Đã thêm thành công !");
+                            object newID = Connect.FirstResulfExec(@"INSERT INTO tb_procedure(name,note)
+                                       VALUES (@name ,@note ) select SCOPE_IDENTITY()", new string[2] { "@name", "@note" }, new object[2] { item.name.ToString(), item.note.ToString() });
+
+                            if (newID != null)
+                                response = new ResponseJson(newID.ToString(), false, "Đã thêm thành công !");
                         }
                     }
                 }
@@ -113,17 +116,19 @@ namespace API_PhanCongCongViec.Controllers
             {
                 try
                 {
-                    string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
-                    if (author == "Administrator" || author == "ProjectManager")
+                    if (item.name.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa nhập Tên !");
+                    else
                     {
-                        if (item.name.ToString().Trim() == "")
-                            response = new ResponseJson(null, true, "Chưa nhập Tên !");
-                        else
+                        string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                        if (author == "Administrator")
                         {
-                            if (Connect.Exec(@"UPDATE tb_DEPARTMENT
+                            if (Connect.Exec(@"UPDATE tb_procedure
                                         SET
-                                            name = @name 
-                                       WHERE id = @id ", new string[2] { "@name", "@id" }, new object[2] { item.name.ToString(), int.Parse(item.id.ToString()) }))
+                                            name = @name
+                                           ,note = @note
+                                       WHERE id = @id ", new string[3] { "@name", "@note", "@id" }
+                                                           , new object[3] { item.name.ToString(), item.note.ToString(), int.Parse(item.id.ToString()) }))
                             {
                                 response = new ResponseJson(null, false, "Đã cập nhật thành công !");
                             }

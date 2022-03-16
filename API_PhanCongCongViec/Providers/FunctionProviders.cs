@@ -1,11 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace API_Tracy.Providers
 {
     public static class FunctionProviders
     {
+        public static string[] FindItemNotExist(string[] arrA, string[] arrB)
+        {
+            List<string> result = new List<string>();
+            foreach (var item in arrA)
+            {
+                if (!arrB.Contains(item))
+                    result.Add(item);
+            }
+            return result.ToArray();
+        }
+
         public static string TinhThamNien(this Nullable<DateTime> date)
         {
             if (date == null)
@@ -83,7 +96,7 @@ namespace API_Tracy.Providers
         {
             string val = NumberToWordConverter.ConverterToCurrency(double.Parse(numb), "Dollar", "Cent");
             return val;
-        } 
+        }
         #endregion
 
         #region CONVERT DECIMAL TO STRING VND

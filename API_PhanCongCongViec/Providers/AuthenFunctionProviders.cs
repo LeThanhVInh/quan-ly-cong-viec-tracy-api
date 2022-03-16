@@ -27,6 +27,51 @@ namespace API_Tracy.Providers
             }
             return result;
         }
+        public static string GetAuthority(IHeaderDictionary headers)
+        {
+            string result = "";
+
+            string username = headers["username"].ToString().Trim();
+            if (username != "")
+            {
+                string username_output = TokenManager.ValidateToken(username)[0];
+                result = username_output.GetAuthorityName();
+            }
+            return result;
+        }
+
+        public static string GetAuthorityName(this string username)
+        {
+            string result = "";
+            int userType = int.Parse((Connect.getField("tb_User", "userTypeID", "username", username) ?? "0").ToString());
+            if (userType != 1)
+            {
+                int userID = int.Parse((Connect.getField("tb_User", "id", "username", username) ?? "0").ToString());
+                int projectID = int.Parse((Connect.getField("tb_Project_Manager", "projectID", "userID", userID) ?? "0").ToString());
+                if (projectID != 0)
+                    result = "ProjectManager";
+                else
+                    result = "Member";
+            }
+            else if (userType == 1)
+                result = "Administrator";
+            return result;
+        }
+
+        public static int GetAuthorityID(IHeaderDictionary headers)
+        {
+            int result = 0;
+            string username = headers["username"].ToString().Trim();
+
+            if (username != "")
+            {
+                string username_output = TokenManager.ValidateToken(username)[0];
+                result = int.Parse((Connect.getField("tb_User", "id", "username", username_output) ?? "0").ToString());
+            }
+
+            return result;
+        }
+
         public static string GenerateSlug(this string phrase)
         {
             string str = phrase.RemoveAccent().ToLower();

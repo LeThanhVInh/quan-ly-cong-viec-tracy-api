@@ -16,6 +16,7 @@
     <None Remove="System.Drawing.Common" />
     <None Remove="System.IO.FileSystem" />
     <None Remove="System.IO" />
+    <None Remove="RestSharp" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.20" />
@@ -24,6 +25,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.15.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.15.0" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+    <PackageReference Include="RestSharp" Version="107.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />

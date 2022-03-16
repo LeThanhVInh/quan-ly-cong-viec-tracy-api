@@ -19,16 +19,20 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                DataTable list = Connect.GetTable(@"
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator" || author == "ProjectManager")
+                {
+                    DataTable list = Connect.GetTable(@"
                         SELECT T.name TeamName, U.fullname UserFullName , TU.*
                         FROM tb_TEAM_USER TU LEFT JOIN tb_User U ON U.id=TU.userID
                                              LEFT JOIN tb_Team T ON T.id=TU.teamID
                         WHERE TU.teamID = @teamID ",
-                                                    new string[1] { "@teamID" },
-                                                    new object[1] { teamID });
+                                                        new string[1] { "@teamID" },
+                                                        new object[1] { teamID });
 
-                if (list != null)
-                    response = new ResponseJson(list, false, "");
+                    if (list != null)
+                        response = new ResponseJson(list, false, "");
+                }
             }
 
             return response;
@@ -41,13 +45,17 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                if (Connect.Exec(@"delete from tb_TEAM_USER where teamID=@teamID and userID=@userID",
-                                new string[2] { "@teamID", "@userID" },
-                                new object[2] { teamID, userID })
-                    )
-                    response = new ResponseJson(null, false, "Đã xóa thành công !");
-                else
-                    response = new ResponseJson(null, true, "Đã có lỗi xảy ra !");
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator")
+                {
+                    if (Connect.Exec(@"delete from tb_TEAM_USER where teamID=@teamID and userID=@userID",
+                                    new string[2] { "@teamID", "@userID" },
+                                    new object[2] { teamID, userID })
+                        )
+                        response = new ResponseJson(null, false, "Đã xóa thành công !");
+                    else
+                        response = new ResponseJson(null, true, "Đã có lỗi xảy ra !");
+                }
             }
 
             return response;
@@ -62,7 +70,11 @@ namespace API_PhanCongCongViec.Controllers
             {
                 try
                 {
-                    response = StaticClass.InsertUserTeam(response, item.userID.ToString(), item.teamID.ToString());
+                    string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                    if (author == "Administrator")
+                    {
+                        response = StaticClass.InsertUserTeam(response, item.userID.ToString(), item.teamID.ToString());
+                    }
                 }
                 catch (Exception ex)
                 {

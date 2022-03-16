@@ -18,10 +18,14 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                DataTable item = Connect.GetTable(@"select * from tb_TEAM where id=@id", new string[1] { "@id" }, new object[1] { id });
-                if (item != null)
-                    if (item.Rows.Count > 0)
-                        response = new ResponseJson(item, false, "");
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator")
+                {
+                    DataTable item = Connect.GetTable(@"select * from tb_TEAM where id=@id", new string[1] { "@id" }, new object[1] { id });
+                    if (item != null)
+                        if (item.Rows.Count > 0)
+                            response = new ResponseJson(item, false, "");
+                }
             }
             return response;
         }
@@ -33,13 +37,17 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                DataTable list = Connect.GetTable(@"
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator" || author == "ProjectManager")
+                {
+                    DataTable list = Connect.GetTable(@"
                             SELECT T.* ,
                                (select count(userID) from tb_Team_User where teamid=T.id) memberAmount
                             FROM tb_TEAM T ");
 
-                if (list != null)
-                    response = new ResponseJson(list, false, "");
+                    if (list != null)
+                        response = new ResponseJson(list, false, "");
+                }
             }
 
             return response;
@@ -52,8 +60,12 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                if (Connect.Exec(@"delete from tb_TEAM where id=@id", new string[1] { "@id" }, new object[1] { id }))
-                    response = new ResponseJson(null, false, "Đã xóa thành công !");
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator")
+                {
+                    if (Connect.Exec(@"delete from tb_TEAM where id=@id", new string[1] { "@id" }, new object[1] { id }))
+                        response = new ResponseJson(null, false, "Đã xóa thành công !");
+                }
             }
 
             return response;
@@ -68,24 +80,28 @@ namespace API_PhanCongCongViec.Controllers
             {
                 try
                 {
-                    if (item.name.ToString().Trim() == "")
-                        response = new ResponseJson(null, true, "Chưa nhập Tên !");
-                    else
+                    string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                    if (author == "Administrator")
                     {
-                        object newID = Connect.FirstResulfExec(@"INSERT INTO tb_TEAM(name) VALUES (@name ) select SCOPE_IDENTITY()",
-                            new string[1] { "@name" }, new object[1] { item.name.ToString() });
-                        if (newID != null)
+                        if (item.name.ToString().Trim() == "")
+                            response = new ResponseJson(null, true, "Chưa nhập Tên !");
+                        else
                         {
-                            if (item.userID.ToString() != "" && item.userID.ToString().Contains(","))
+                            object newID = Connect.FirstResulfExec(@"INSERT INTO tb_TEAM(name) VALUES (@name ) select SCOPE_IDENTITY()",
+                                new string[1] { "@name" }, new object[1] { item.name.ToString() });
+                            if (newID != null)
                             {
-                                string[] id_array = item.userID.ToString().Split(",");
-                                foreach (var userID in id_array)
+                                if (item.userID.ToString() != "" && item.userID.ToString().Contains(","))
                                 {
-                                    if (userID != "")
-                                        StaticClass.InsertUserTeam(response, userID, newID.ToString());
+                                    string[] id_array = item.userID.ToString().Split(",");
+                                    foreach (var userID in id_array)
+                                    {
+                                        if (userID != "")
+                                            StaticClass.InsertUserTeam(response, userID, newID.ToString());
+                                    }
                                 }
+                                response = new ResponseJson(null, false, "Đã thêm thành công !");
                             }
-                            response = new ResponseJson(null, false, "Đã thêm thành công !");
                         }
                     }
                 }
@@ -113,29 +129,33 @@ namespace API_PhanCongCongViec.Controllers
             {
                 try
                 {
-                    if (item.name.ToString().Trim() == "")
-                        response = new ResponseJson(null, true, "Chưa nhập Tên !");
-                    else
+                    string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                    if (author == "Administrator")
                     {
-                        if (Connect.Exec(@"UPDATE tb_TEAM
+                        if (item.name.ToString().Trim() == "")
+                            response = new ResponseJson(null, true, "Chưa nhập Tên !");
+                        else
+                        {
+                            if (Connect.Exec(@"UPDATE tb_TEAM
                                         SET
                                             name = @name 
                                        WHERE id = @id ", new string[2] { "@name", "@id" }, new object[2] { item.name.ToString(), int.Parse(item.id.ToString()) }))
-                        {
-                            if (item.userID.ToString() != "" && item.userID.ToString().Contains(","))
                             {
-                                string[] id_array = item.userID.ToString().Split(",");
-                                foreach (var userID in id_array)
+                                if (item.userID.ToString() != "" && item.userID.ToString().Contains(","))
                                 {
-                                    if (userID != "")
-                                        StaticClass.InsertUserTeam(response, userID, item.id.ToString());
+                                    string[] id_array = item.userID.ToString().Split(",");
+                                    foreach (var userID in id_array)
+                                    {
+                                        if (userID != "")
+                                            StaticClass.InsertUserTeam(response, userID, item.id.ToString());
+                                    }
                                 }
-                            }
 
-                            response = new ResponseJson(null, false, "Đã cập nhật thành công !");
+                                response = new ResponseJson(null, false, "Đã cập nhật thành công !");
+                            }
+                            else
+                                response = new ResponseJson(null, true, "Lỗi, Không lưu được !");
                         }
-                        else
-                            response = new ResponseJson(null, true, "Lỗi, Không lưu được !");
                     }
                 }
                 catch (Exception ex)

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0Jdrinai9oCugVP08fEizmE1g6LSpPT7Y9+mz5zYRs8ObAzbrDIGN0KTYlGTtgZ+X0FjESFpEtTBewKpEW3JWg==",
+  "dgSpecHash": "bQr8gFAVs0q1rI0lVYmgWm2aZMiMpSwvSPMp+xnFsOV5QLb2qYfycJOrE52+mcztRMUIJ2X7iCZNLEALyjx4Pg==",
   "success": true,
   "projectFilePath": "/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/API_PhanCongCongViec.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,7 @@
     "/Users/vinharnold/.nuget/packages/microsoft.win32.systemevents/6.0.0/microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "/Users/vinharnold/.nuget/packages/newtonsoft.json/12.0.2/newtonsoft.json.12.0.2.nupkg.sha512",
     "/Users/vinharnold/.nuget/packages/newtonsoft.json.bson/1.0.2/newtonsoft.json.bson.1.0.2.nupkg.sha512",
+    "/Users/vinharnold/.nuget/packages/restsharp/107.3.0/restsharp.107.3.0.nupkg.sha512",
     "/Users/vinharnold/.nuget/packages/runtime.native.system.data.sqlclient.sni/4.7.0/runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
     "/Users/vinharnold/.nuget/packages/runtime.win-arm64.runtime.native.system.data.sqlclient.sni/4.4.0/runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
     "/Users/vinharnold/.nuget/packages/runtime.win-x64.runtime.native.system.data.sqlclient.sni/4.4.0/runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
@@ -30,7 +31,8 @@
     "/Users/vinharnold/.nuget/packages/system.identitymodel.tokens.jwt/6.15.0/system.identitymodel.tokens.jwt.6.15.0.nupkg.sha512",
     "/Users/vinharnold/.nuget/packages/system.security.accesscontrol/4.7.0/system.security.accesscontrol.4.7.0.nupkg.sha512",
     "/Users/vinharnold/.nuget/packages/system.security.cryptography.cng/4.5.0/system.security.cryptography.cng.4.5.0.nupkg.sha512",
-    "/Users/vinharnold/.nuget/packages/system.security.principal.windows/4.7.0/system.security.principal.windows.4.7.0.nupkg.sha512"
+    "/Users/vinharnold/.nuget/packages/system.security.principal.windows/4.7.0/system.security.principal.windows.4.7.0.nupkg.sha512",
+    "/Users/vinharnold/.nuget/packages/system.text.json/5.0.0/system.text.json.5.0.0.nupkg.sha512"
   ],
   "logs": []
 }

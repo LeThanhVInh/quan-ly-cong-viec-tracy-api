@@ -2,6 +2,7 @@
 using API_Tracy.Models;
 using Microsoft.AspNetCore.Mvc;
 using TokenManagerProvider;
+using API_Tracy.Providers;
 
 namespace API_PhanCongCongViec.Controllers
 {
@@ -27,8 +28,9 @@ namespace API_PhanCongCongViec.Controllers
                     {
                         var token = TokenManager.GenerateToken(login.username.ToString());
                         var username = TokenManager.GenerateToken(login.username.ToString());
+                        var author = AuthenFunctionProviders.GetAuthorityName(login.username.ToString());
 
-                        response = new ResponseJson(new string[] { token, username }, false, "Đăng nhập thành công");
+                        response = new ResponseJson(new string[] { token, username, author }, false, "Đăng nhập thành công");
                     }
                     else
                         response = new ResponseJson(null, true, "Sai mật khẩu !");
@@ -39,19 +41,22 @@ namespace API_PhanCongCongViec.Controllers
         }
 
         [HttpGet]
-        public object Validate(string token, string username)
+        public object Validate(string token, string username, string author)
         {
             ResponseJson response = null;
             try
             {
+                string[] token_output = TokenManager.ValidateToken(token);
+
                 string username_output = TokenManager.ValidateToken(username)[0];
                 object user = Connect.getField("tb_User", "username", "username", username_output);
+                string author_username = AuthenFunctionProviders.GetAuthorityName(token_output[0]);
+
                 if (user == null)
                     response = new ResponseJson(null, true, "Không có dữ liệu !");
                 else
                 {
-                    string[] token_output = TokenManager.ValidateToken(token);
-                    if (username_output.Equals(token_output[0]) && DateTime.Now < DateTime.Parse(token_output[1]))
+                    if (username_output.Equals(token_output[0]) && DateTime.Now < DateTime.Parse(token_output[1]) && author_username == author)
                     {
                         response = new ResponseJson(null, false, "Thành công !");
                     }

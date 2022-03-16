@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using API_Tracy.Models;
@@ -49,12 +50,16 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                string link = _hostingEnvironment.WebRootPath + (Connect.getField("tb_task_Attachment", "('/File/TaskAttachments/' +filename + extension) link", "id", id) ?? "").ToString();
-                if (Connect.Exec(@"delete from tb_Task_Attachment where id=@id", new string[1] { "@id" }, new object[1] { id }))
+                string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                if (author == "Administrator" || author == "ProjectManager")
                 {
-                    if (System.IO.File.Exists(link))
-                        System.IO.File.Delete(link);
-                    response = new ResponseJson(null, false, "Đã xóa thành công !");
+                    string link = _hostingEnvironment.WebRootPath + (Connect.getField("tb_task_Attachment", "('/File/TaskAttachments/' +filename + extension) link", "id", id) ?? "").ToString();
+                    if (Connect.Exec(@"delete from tb_Task_Attachment where id=@id", new string[1] { "@id" }, new object[1] { id }))
+                    {
+                        if (System.IO.File.Exists(link))
+                            System.IO.File.Delete(link);
+                        response = new ResponseJson(null, false, "Đã xóa thành công !");
+                    }
                 }
             }
 
@@ -68,44 +73,62 @@ namespace API_PhanCongCongViec.Controllers
             ResponseJson response = new ResponseJson(null, true, "Đã có lỗi xảy ra");
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
-                string uploads = Path.Combine(_hostingEnvironment.WebRootPath, "File/TaskAttachments");
-                foreach (IFormFile file in files)
+                try
                 {
-                    if (file.Length > 0)
+                    string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                    if (author == "Administrator" || author == "ProjectManager")
                     {
-                        string Time = DateTime.Now.ToString("dd.MM.yyyy.HH.mm.ss");
-                        string filePath = Path.Combine(uploads, Time + "_" + file.FileName);
-                        using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+                        string uploads = Path.Combine(_hostingEnvironment.WebRootPath, "File/TaskAttachments");
+                        foreach (IFormFile file in files)
                         {
-                            await file.CopyToAsync(fileStream);
-                        }
-                        #region Check fileType
+                            if (file.Length > 0)
+                            {
+                                string Time = DateTime.Now.ToString("dd.MM.yyyy.HH.mm.ss");
+                                string filePath = Path.Combine(uploads, Time + "_" + file.FileName);
+                                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+                                {
+                                    await file.CopyToAsync(fileStream);
+                                }
+                                #region Check fileType
 
-                        string fileType = null;
-                        string fileExtension = Path.GetExtension(file.FileName);
-                        if (fileExtension == ".png" || fileExtension == ".jpeg" || fileExtension == ".jpg" || fileExtension == ".heic")
-                            fileType = "image";
-                        else if (fileExtension == ".doc" || fileExtension == ".docx")
-                            fileType = "word";
-                        else if (fileExtension == ".xlsx" || fileExtension == ".xls" || fileExtension == ".csv")
-                            fileType = "excel";
-                        else if (fileExtension == ".pdf")
-                            fileType = "pdf";
-                        else if (fileExtension == ".zip" || fileExtension == ".rar")
-                            fileType = "archive";
+                                string fileType = null;
+                                string fileExtension = Path.GetExtension(file.FileName);
+                                if (fileExtension == ".png" || fileExtension == ".jpeg" || fileExtension == ".jpg" || fileExtension == ".heic")
+                                    fileType = "image";
+                                else if (fileExtension == ".doc" || fileExtension == ".docx")
+                                    fileType = "word";
+                                else if (fileExtension == ".xlsx" || fileExtension == ".xls" || fileExtension == ".csv")
+                                    fileType = "excel";
+                                else if (fileExtension == ".pdf")
+                                    fileType = "pdf";
+                                else if (fileExtension == ".zip" || fileExtension == ".rar")
+                                    fileType = "archive";
 
-                        #endregion
-                        Connect.Exec(@"INSERT INTO tb_Task_Attachment(filename, extension, type, taskID)
+                                #endregion
+                                Connect.Exec(@"INSERT INTO tb_Task_Attachment(filename, extension, type, taskID)
                                        VALUES(@filename, @extension, @type, @taskID)",
-                                       new string[] { "@filename", "@extension", "@type", "@taskID" },
-                                       new object[] { Time + "_" + Path.GetFileNameWithoutExtension(file.FileName),
+                                               new string[] { "@filename", "@extension", "@type", "@taskID" },
+                                               new object[] { Time + "_" + Path.GetFileNameWithoutExtension(file.FileName),
                                                        fileExtension,
                                                        fileType ?? Convert.DBNull,
                                                        taskID });
+                            }
+                        }
+
+                        response = new ResponseJson(null, false, "");
                     }
                 }
+                catch (Exception ex)
+                {
+                    // Get stack trace for the exception with source file information
+                    var st = new StackTrace(ex, true);
+                    // Get the top stack frame
+                    var frame = st.GetFrame(st.FrameCount - 1);
+                    // Get the line number from the stack frame
+                    var line = frame.GetFileLineNumber();
 
-                response = new ResponseJson(null, false, "");
+                    response = new ResponseJson(null, true, ex.Message + Environment.NewLine + "line: " + line);
+                }
             }
             return response;
         }
