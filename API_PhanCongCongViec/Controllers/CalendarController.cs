@@ -22,6 +22,9 @@ namespace API_PhanCongCongViec.Controllers
                 {
                     string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                     int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                    string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                    if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                        author = "Member";
                     //int projectManagerID = int.Parse((Connect.getField("tb_Project_Manager", "userID", "userID=" + authorID + " AND projectID", projectID) ?? "0").ToString());
 
                     //if (author == "Administrator" || (author == "ProjectManager" && projectManagerID == authorID))

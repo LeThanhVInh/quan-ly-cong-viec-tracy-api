@@ -2,7 +2,6 @@
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using API_Tracy.Models;
 using API_Tracy.Providers;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +52,10 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
 
                 #region sql
 
@@ -106,7 +109,7 @@ namespace API_PhanCongCongViec.Controllers
                 else if (status == "AccomplishedTask")
                     sql += @"                  and T.finishPercent=100 and T.isFinished=1 ";
                 else if (status == "ProcessingTask")
-                    sql += @"                  and DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0 ";
+                    sql += @"                  and ( DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0 OR DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3 ) ";
                 else if (status == "LateTask")
                     sql += @"                  and T.enddate < GETDATE() and T.finishPercent < 100 and T.isFinished = 0 ";
                 #endregion
@@ -140,6 +143,10 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
+
                 #region sql
                 string sql = @"         SELECT T.* , U.fullname CreatorName , " + StaticClass.sqlGetTaskStatus + @" ,
                                                 TG.name TaskGroupName,
@@ -197,7 +204,7 @@ namespace API_PhanCongCongViec.Controllers
                 else if (status == "AccomplishedTask")
                     sql += @"                  and T.finishPercent=100 and T.isFinished=1 ";
                 else if (status == "ProcessingTask")
-                    sql += @"                  and DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0 ";
+                    sql += @"                  and ( DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0 OR DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3 ) ";
                 else if (status == "LateTask")
                     sql += @"                  and T.enddate < GETDATE() and T.finishPercent < 100 and T.isFinished = 0 ";
                 #endregion
@@ -212,8 +219,7 @@ namespace API_PhanCongCongViec.Controllers
                 }
                 #endregion
 
-                sql += @"
-                                        ORDER BY TG.id desc, T.id asc ";
+                sql += @"                   ORDER BY TG.id desc, T.id asc ";
 
                 #endregion
                 DataTable list = Connect.GetTable(sql, stringParam, objectParam);
@@ -234,6 +240,9 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
 
                 #region sql
                 string sql = @"
@@ -380,7 +389,7 @@ namespace API_PhanCongCongViec.Controllers
                     {
                         if (userID != "")
                             TelegramController.SendMessage(int.Parse(userID),
-                                  "🔔 Admin vừa xoá tác vụ đã giao cho bạn : <b>" + taskName + "</b>");
+                                  "❌ Admin vừa xoá tác vụ đã giao cho bạn : <b>" + taskName + "</b>");
 
                         response = new ResponseJson(null, false, "Đã xóa thành công !");
                     }
@@ -441,7 +450,7 @@ namespace API_PhanCongCongViec.Controllers
                                         if (memberID[i] != "")
                                         {
                                             TelegramController.SendMessage(int.Parse(memberID[i]),
-                                                  "🔔 Admin vừa giao bạn một tác vụ : <b>" + item.name.ToString() + "</b>");
+                                                  "📌 Admin vừa giao bạn một tác vụ : <b>" + item.name.ToString() + "</b>");
 
                                             Connect.Exec(@"INSERT INTO tb_TASK_MEMBER(userID,taskID)
                                                        VALUES(@userID, @taskID)"
@@ -525,7 +534,7 @@ namespace API_PhanCongCongViec.Controllers
                                     if (member_delete[i] != "")
                                     {
                                         TelegramController.SendMessage(int.Parse(member_delete[i]),
-                                              "🔔 Admin vừa xoá một tác vụ mà bạn được giao : <b>" + item.name.ToString() + "</b>");
+                                              "❌ Admin vừa xoá một tác vụ mà bạn được giao : <b>" + item.name.ToString() + "</b>");
 
                                         Connect.Exec(@" Delete tb_Task_Member where userID=@userID and taskID=@taskID "
                                                     , new string[2] { "@userID", "@taskID" }
@@ -537,7 +546,7 @@ namespace API_PhanCongCongViec.Controllers
                                     if (member_insert[i] != "")
                                     {
                                         TelegramController.SendMessage(int.Parse(member_insert[i]),
-                                              "🔔 Admin vừa giao bạn vào một tác vụ : <b>" + item.name.ToString() + "</b>");
+                                              "📌 Admin vừa giao bạn vào một tác vụ : <b>" + item.name.ToString() + "</b>");
 
                                         Connect.Exec(@"INSERT INTO tb_TASK_MEMBER(userID,taskID)
                                                        VALUES(@userID, @taskID)"

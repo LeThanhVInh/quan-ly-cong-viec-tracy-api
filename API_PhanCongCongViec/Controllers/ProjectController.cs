@@ -54,7 +54,7 @@ namespace API_PhanCongCongViec.Controllers
         }
 
         [HttpGet]
-        public object getListByPageNumber(int pageNum, int pageSize)
+        public object getListByPageNumber(int pageNum, int pageSize, string searchString)
         {
             ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
 
@@ -62,13 +62,23 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
 
                 pageNum -= 1;
                 if (pageNum <= 0) pageNum = 0;
                 int pageStart = pageNum * pageSize;
 
                 #region sql
-                string sql = @"SELECT * from
+
+                string[] stringParam = new string[] { };
+                object[] objectParam = new object[] { };
+                string sql = "";
+                if (author == "Administrator")
+                {
+                    #region sql admin
+                    sql = @"SELECT * from
                                (
                                     SELECT P.*, DE.name departmentName ,
                                         (select count(*) from
@@ -101,7 +111,8 @@ namespace API_PhanCongCongViec.Controllers
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
-                                         where
+                                         where TG.projectID= P.id
+                                               and
                                                (
                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
@@ -130,6 +141,14 @@ namespace API_PhanCongCongViec.Controllers
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
+                                    WHERE 1=1 ";
+                    if ((searchString ?? "").Trim() != "")
+                    {
+                        sql += " and ( P.name LIKE N'%'+ @searchString +'%' OR P.description LIKE N'%'+ @searchString +'%' ) ";
+                        stringParam = stringParam.Concat(new string[] { "@searchString" }).ToArray();
+                        objectParam = objectParam.Concat(new object[] { searchString }).ToArray();
+                    }
+                    sql += @"
                                ) AS tb1
                                GROUP BY tb1.id, tb1.name, tb1.startdate, tb1.enddate, tb1.departmentID, tb1.isPriority, tb1.[description], tb1.procedureID, tb1.departmentName, tb1.memberAmount, 
                                         tb1.TotalTask, tb1.LateTask, tb1.ProcessingTask, tb1.AccomplishedTask, tb1.FailedTask, tb1.WaitingTask
@@ -137,7 +156,9 @@ namespace API_PhanCongCongViec.Controllers
                                OFFSET " + pageStart + @" ROWS
                                FETCH NEXT " + pageSize + @" ROWS ONLY; ";
 
-                if (author == "ProjectManager")
+                    #endregion
+                }
+                else if (author == "ProjectManager")
                 {
                     #region sql
                     sql = @"   SELECT * from
@@ -222,7 +243,15 @@ namespace API_PhanCongCongViec.Controllers
                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
                                                       LEFT JOIN tb_Project_Manager PM ON PM.projectID=P.id
                                                       LEFT JOIN tb_Project_Member PMm ON PMm.projectID=P.id
-                                    WHERE PM.userID=" + authorID + " OR PMm.userID=" + authorID + @"
+                                    WHERE (PM.userID=" + authorID + " OR PMm.userID=" + authorID + @") ";
+
+                    if ((searchString ?? "").Trim() != "")
+                    {
+                        sql += " and ( P.name LIKE N'%'+ @searchString +'%' OR P.description LIKE N'%'+ @searchString +'%' ) ";
+                        stringParam = stringParam.Concat(new string[] { "@searchString" }).ToArray();
+                        objectParam = objectParam.Concat(new object[] { searchString }).ToArray();
+                    }
+                    sql += @"
                                ) AS tb1
                                GROUP BY tb1.id, tb1.name, tb1.startdate, tb1.enddate, tb1.departmentID, tb1.isPriority, tb1.[description], tb1.procedureID, tb1.departmentName, tb1.memberAmount, 
                                         tb1.TotalTask, tb1.LateTask, tb1.ProcessingTask, tb1.AccomplishedTask, tb1.FailedTask, tb1.WaitingTask
@@ -309,7 +338,15 @@ namespace API_PhanCongCongViec.Controllers
                                         ------------------------------------------------------------------------------------
                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
                                                       LEFT JOIN tb_Project_Member PMm ON PMm.projectID=P.id
-                                    WHERE PMm.userID=" + authorID + @"
+                                    WHERE PMm.userID=" + authorID + @" ";
+
+                    if ((searchString ?? "").Trim() != "")
+                    {
+                        sql += " and ( P.name LIKE N'%'+ @searchString +'%' OR P.description LIKE N'%'+ @searchString +'%' ) ";
+                        stringParam = stringParam.Concat(new string[] { "@searchString" }).ToArray();
+                        objectParam = objectParam.Concat(new object[] { searchString }).ToArray();
+                    }
+                    sql += @"
                                ) AS tb1
                                GROUP BY tb1.id, tb1.name, tb1.startdate, tb1.enddate, tb1.departmentID, tb1.isPriority, tb1.[description], tb1.procedureID, tb1.departmentName, tb1.memberAmount, 
                                         tb1.TotalTask, tb1.LateTask, tb1.ProcessingTask, tb1.AccomplishedTask, tb1.FailedTask, tb1.WaitingTask
@@ -319,7 +356,7 @@ namespace API_PhanCongCongViec.Controllers
                     #endregion
                 }
                 #endregion
-                DataTable list = Connect.GetTable(sql);
+                DataTable list = Connect.GetTable(sql, stringParam, objectParam);
                 if (list != null)
                     response = new ResponseJson(list, false, "");
 
@@ -337,6 +374,9 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
 
                 #region sql
                 string sql = @" SELECT tb_Member.* ,
@@ -581,6 +621,10 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
+
                 //if (author == "Administrator" || author == "ProjectManager")
                 {
                     #region sql
@@ -814,6 +858,9 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
 
                 #region sql
                 string sql = @"     SELECT
@@ -992,6 +1039,10 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
+
                 //if (author == "Administrator" || author == "ProjectManager")
                 {
                     #region sql
@@ -1145,6 +1196,10 @@ namespace API_PhanCongCongViec.Controllers
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
                 int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                string clientRouter = Request.Headers["clientRouter"].ToString().Trim();
+                if (clientRouter.ToLower() == "/cong-viec-cua-toi")
+                    author = "Member";
+
                 //if (author == "Administrator" || author == "ProjectManager")
                 {
                     string sql = @" SELECT P.name ProjectName ,
@@ -1430,7 +1485,7 @@ namespace API_PhanCongCongViec.Controllers
                                         if (managerID[i] != "")
                                         {
                                             TelegramController.SendMessage(int.Parse(managerID[i]),
-                                                  "🔔 Admin vừa thêm bạn vào quản lý cho dự án: <b>" + item.name.ToString() + "</b>");
+                                                  "📌 Admin vừa thêm bạn vào quản lý cho dự án: <b>" + item.name.ToString() + "</b>");
 
                                             Connect.Exec(@"INSERT INTO tb_PROJECT_MANAGER(userID,projectID)
                                                        VALUES(@userID, @projectID)"
@@ -1457,7 +1512,7 @@ namespace API_PhanCongCongViec.Controllers
                                         if (memberID[i] != "")
                                         {
                                             TelegramController.SendMessage(int.Parse(memberID[i]),
-                                                  "🔔 Admin vừa thêm bạn tham gia vào dự án: <b>" + item.name.ToString() + "</b>");
+                                                  "📌 Admin vừa thêm bạn tham gia vào dự án: <b>" + item.name.ToString() + "</b>");
 
                                             Connect.Exec(@"INSERT INTO tb_PROJECT_MEMBER(userID,projectID)
                                                        VALUES(@userID, @projectID)"
@@ -1566,7 +1621,7 @@ namespace API_PhanCongCongViec.Controllers
                                         if (member_delete[i] != "")
                                         {
                                             TelegramController.SendMessage(int.Parse(member_delete[i]),
-                                                  "🔔 Admin vừa xoá bạn ra khỏi dự án: <b>" + item.name.ToString() + "</b>");
+                                                  "❌ Admin vừa xoá bạn ra khỏi dự án: <b>" + item.name.ToString() + "</b>");
 
                                             Connect.Exec(@" Delete tb_Project_Member where userID=@userID and projectID=@projectID "
                                                         , new string[2] { "@userID", "@projectID" }
@@ -1578,7 +1633,7 @@ namespace API_PhanCongCongViec.Controllers
                                         if (member_insert[i] != "")
                                         {
                                             TelegramController.SendMessage(int.Parse(member_insert[i]),
-                                                  "🔔 Admin vừa thêm bạn vào dự án: <b>" + item.name.ToString() + "</b>");
+                                                  "📌 Admin vừa thêm bạn vào dự án: <b>" + item.name.ToString() + "</b>");
 
                                             Connect.Exec(@"INSERT INTO tb_PROJECT_MEMBER(userID,projectID)
                                                        VALUES(@userID, @projectID)"
@@ -1598,7 +1653,7 @@ namespace API_PhanCongCongViec.Controllers
                                         if (manager_delete[i] != "")
                                         {
                                             TelegramController.SendMessage(int.Parse(manager_delete[i]),
-                                                  "🔔 Admin vừa xoá bạn ra khỏi dự án bạn quản lý : <b>" + item.name.ToString() + "</b>");
+                                                  "❌ Admin vừa xoá bạn ra khỏi dự án bạn quản lý : <b>" + item.name.ToString() + "</b>");
 
                                             Connect.Exec(@" Delete tb_Project_manager where userID=@userID and projectID=@projectID "
                                                         , new string[2] { "@userID", "@projectID" }
@@ -1610,7 +1665,7 @@ namespace API_PhanCongCongViec.Controllers
                                         if (manager_insert[i] != "")
                                         {
                                             TelegramController.SendMessage(int.Parse(manager_insert[i]),
-                                                  "🔔 Admin vừa thêm bạn vào quản lý cho dự án: <b>" + item.name.ToString() + "</b>");
+                                                  "📌 Admin vừa thêm bạn vào quản lý cho dự án: <b>" + item.name.ToString() + "</b>");
 
                                             Connect.Exec(@"INSERT INTO tb_PROJECT_manager(userID,projectID)
                                                        VALUES(@userID, @projectID)"

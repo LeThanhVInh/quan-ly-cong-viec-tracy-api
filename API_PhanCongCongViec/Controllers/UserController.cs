@@ -266,5 +266,57 @@ namespace API_PhanCongCongViec.Controllers
             }
             return response;
         }
+
+        [HttpPost]
+        public object ChangePassword([FromBody] dynamic item)
+        {
+            ResponseJson response = new ResponseJson(null, true, "Đã có lỗi xảy ra");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                try
+                {
+                    int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+                    string oldPasswordDB = (Connect.getField("tb_User", "password", "id", authorID) ?? "0").ToString();
+
+                    if (item.oldPassword.ToString().Trim() == "" || item.newPassword.ToString().Trim() == "" || item.confirmPassword.ToString().Trim() == "")
+                        response = new ResponseJson(null, true, "Chưa nhập đủ thông tin !");
+                    else if (item.newPassword.ToString().Trim() != item.confirmPassword.ToString().Trim())
+                        response = new ResponseJson(null, true, "Mật khẩu mới không khớp !");
+                    else if (item.oldPassword.ToString().Trim() != oldPasswordDB)
+                        response = new ResponseJson(null, true, "Mật khẩu cũ không đúng !");
+                    else
+                    {
+                        if (Connect.Exec(@"UPDATE tb_USER
+                                        SET 
+                                           password = @password 
+                                       WHERE id = @id "
+                                        , new string[2] { "@password", "@id" }
+                                        , new object[2] {
+                                                (item.newPassword.ToString().Trim() == "" ? Convert.DBNull : item.newPassword.ToString().Trim())
+                                                    , authorID
+                                        })
+                            )
+                        {
+                            response = new ResponseJson(null, false, "Đã cập nhật thành công !");
+                        }
+                        else
+                            response = new ResponseJson(null, true, "Lỗi, Không lưu được !");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Get stack trace for the exception with source file information
+                    var st = new StackTrace(ex, true);
+                    // Get the top stack frame
+                    var frame = st.GetFrame(st.FrameCount - 1);
+                    // Get the line number from the stack frame
+                    var line = frame.GetFileLineNumber();
+
+                    response = new ResponseJson(null, true, ex.Message + Environment.NewLine + "line: " + line);
+                }
+            }
+            return response;
+        }
     }
 }
