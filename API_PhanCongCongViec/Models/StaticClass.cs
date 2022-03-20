@@ -12,12 +12,12 @@ public static class StaticClass
                                     ELSE
                                        CASE WHEN T.enddate < GETDATE()
                                               THEN 
-                                                   CASE WHEN T.finishPercent = 100
+                                                   CASE WHEN ISNULL(T.finishPercent,0) = 100
                                                        THEN N'Đã hoàn thành_green'
                                                        ELSE N'Đã hết hạn_red'
                                                    END
                                               ELSE
-                                                   CASE WHEN T.finishPercent = 100
+                                                   CASE WHEN ISNULL(T.finishPercent,0) = 100
                                                      THEN N'Đã hoàn thành_green'
                                                      ELSE
                                                        CASE WHEN DATEDIFF(DAY, GETDATE(), T.enddate) <= 3

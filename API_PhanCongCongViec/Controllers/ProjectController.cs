@@ -105,25 +105,24 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where TG.projectID= P.id
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                          where TG.projectID= P.id
-                                               and
+                                               and 
                                                (
-                                                   (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
-                                               )
-                                               and T.isFinished = 0
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                               )   
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                          where TG.projectID= P.id
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                         ) AccomplishedTask,
                                         ------------------------------------------------------------------------------------
@@ -193,8 +192,8 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -203,10 +202,10 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -216,7 +215,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) AccomplishedTask,
@@ -293,8 +292,8 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                                and TM.userID=" + authorID + @"
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -302,10 +301,10 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                                and TM.userID=" + authorID + @"
                                         ) ProcessingTask,
@@ -314,7 +313,7 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                                and TM.userID=" + authorID + @"
                                         ) AccomplishedTask,
@@ -392,8 +391,8 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
@@ -401,10 +400,10 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -413,7 +412,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                         ) AccomplishedTask,
                                         ------------------------------------------------------------------------------------
@@ -463,8 +462,8 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -474,10 +473,10 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) ProcessingTask,
@@ -488,7 +487,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) AccomplishedTask,
@@ -545,8 +544,8 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                                and (TM.userID=" + authorID + @")
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -555,10 +554,10 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                                and (TM.userID=" + authorID + @")
                                         ) ProcessingTask,
@@ -568,7 +567,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                                and (TM.userID=" + authorID + @")
                                         ) AccomplishedTask,
@@ -640,18 +639,18 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where  TM.userID=tb_Member.userID 
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where  TM.userID=tb_Member.userID 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -659,7 +658,7 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where  TM.userID=tb_Member.userID 
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                         ) AccomplishedTask,
                                         ------------------------------------------------------------------------------------
@@ -704,8 +703,8 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
                                          where  TM.userID=tb_Member.userID 
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                                and PM.userID = " + authorID + @"
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -714,10 +713,10 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                                         LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
                                          where  TM.userID=tb_Member.userID 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                                and PM.userID = " + authorID + @"
                                         ) ProcessingTask,
@@ -727,7 +726,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                                         LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
                                          where  TM.userID=tb_Member.userID 
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                                and PM.userID = " + authorID + @"
                                         ) AccomplishedTask,
@@ -780,8 +779,8 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                          where  TM.userID=tb_Member.userID 
                                                and T.enddate < GETDATE() 
-                                               and T.finishPercent < 100
-                                               and T.isFinished = 0
+                                               and ISNULL(T.finishPercent,0) < 100
+                                               and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -790,10 +789,10 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                          where  TM.userID=tb_Member.userID 
-                                               and
+                                               and 
                                                (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
                                                )
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -803,7 +802,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                          where  TM.userID=tb_Member.userID 
-                                               and T.finishPercent=100 
+                                               and ISNULL(T.finishPercent,0)=100 
                                                and T.isFinished=1 
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) AccomplishedTask,
@@ -870,22 +869,22 @@ namespace API_PhanCongCongViec.Controllers
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where TG.projectID=P.id and T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                          where TG.projectID=P.id 
-                                            and
+                                            and 
                                             (
-                                                 (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                              OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
                                             )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                          where TG.projectID=P.id 
-                                            and T.finishPercent=100 
+                                            and ISNULL(T.finishPercent,0)=100 
                                             and T.isFinished=1 
                                         ) AccomplishedTask,
                                         ------------------------------------------------------------------------------------
@@ -918,8 +917,8 @@ namespace API_PhanCongCongViec.Controllers
                                                                            LEFT JOIN tb_Project_Manager PM ON PM.projectID=TG.projectID
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id and T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -927,11 +926,11 @@ namespace API_PhanCongCongViec.Controllers
                                                                            LEFT JOIN tb_Project_Manager PM ON PM.projectID=TG.projectID
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and
-                                               (
-                                                    (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                                 OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
-                                               )
+                                            and 
+                                            (
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                            )
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -939,7 +938,7 @@ namespace API_PhanCongCongViec.Controllers
                                                                            LEFT JOIN tb_Project_Manager PM ON PM.projectID=TG.projectID
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and T.finishPercent=100 
+                                            and ISNULL(T.finishPercent,0)=100 
                                             and T.isFinished=1 
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) AccomplishedTask,
@@ -978,18 +977,18 @@ namespace API_PhanCongCongViec.Controllers
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id and T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                             and (TM.userID=" + authorID + @")
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id  
-                                            and
+                                            and 
                                             (
-                                                (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                             OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
                                             )
                                             and (TM.userID=" + authorID + @")
                                         ) ProcessingTask,
@@ -997,7 +996,7 @@ namespace API_PhanCongCongViec.Controllers
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and T.finishPercent=100 
+                                            and ISNULL(T.finishPercent,0)=100 
                                             and T.isFinished=1 
                                             and (TM.userID=" + authorID + @")
                                         ) AccomplishedTask,
@@ -1052,15 +1051,15 @@ namespace API_PhanCongCongViec.Controllers
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where  T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
-                                         where
+                                         where 
                                             (
-                                                (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                             OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
                                             )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -1092,18 +1091,18 @@ namespace API_PhanCongCongViec.Controllers
                                                                            LEFT JOIN tb_PROJECT_MANAGER PM ON TG.projectID=PM.projectID
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where  T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0 
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_PROJECT_MANAGER PM ON TG.projectID=PM.projectID
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
-                                         where
+                                         where 
                                             (
-                                                (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                             OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
                                             )
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -1142,17 +1141,17 @@ namespace API_PhanCongCongViec.Controllers
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where  T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                             and TM.userID = " + authorID + @"
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                         where
+                                         where 
                                             (
-                                                (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                             OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
                                             )
                                             and TM.userID = " + authorID + @"
                                         ) ProcessingTask,
@@ -1211,24 +1210,24 @@ namespace API_PhanCongCongViec.Controllers
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where TG.projectID=P.id and T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                          where TG.projectID=P.id 
-                                            and
+                                            and 
                                             (
-                                                (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                             OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
                                             )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                          where TG.projectID=P.id 
-                                            and T.finishPercent=100 
+                                            and ISNULL(T.finishPercent,0)=100 
                                             and T.isFinished=1 
                                         ) AccomplishedTask,
                                         ------------------------------------------------------------------------------------
@@ -1268,8 +1267,8 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID=P.id and T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -1278,9 +1277,10 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and (
-                                                (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0) 
-                                             OR (DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3) 
+                                            and 
+                                            (
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
                                             )
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -1290,7 +1290,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and T.finishPercent=100 
+                                            and ISNULL(T.finishPercent,0)=100 
                                             and T.isFinished=1 
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) AccomplishedTask,
@@ -1338,8 +1338,8 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where TG.projectID=P.id and T.enddate < GETDATE() 
-                                            and T.finishPercent < 100
-                                            and T.isFinished = 0
+                                            and ISNULL(T.finishPercent,0) < 100
+                                            and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
                                             and TM.userID=" + authorID + @"
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
@@ -1347,8 +1347,11 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where TG.projectID=P.id 
-                                            and DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0
-                                            and T.isFinished = 0
+                                            and 
+                                            (
+                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
+                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                            )
                                             and TM.userID=" + authorID + @"
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -1356,7 +1359,7 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where TG.projectID=P.id 
-                                            and T.finishPercent=100 
+                                            and ISNULL(T.finishPercent,0)=100 
                                             and T.isFinished=1 
                                             and TM.userID=" + authorID + @"
                                         ) AccomplishedTask,

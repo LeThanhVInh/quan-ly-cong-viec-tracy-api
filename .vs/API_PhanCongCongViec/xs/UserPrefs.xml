@@ -1,10 +1,6 @@
 ﻿<Properties GitUserInfo="UsingGIT" StartupConfiguration="{1F6B642A-9166-4828-B2A5-507C3B1B29A6}|Default">
   <MonoDevelop.Ide.ItemProperties.API__PhanCongCongViec PreferredExecutionTarget="/Applications/CocCoc.app" />
   <MonoDevelop.Ide.Workbench>
-    <Files>
-      <File FileName="API_PhanCongCongViec/Controllers/ProjectController.cs" Line="67" Column="39" />
-      <File FileName="API_PhanCongCongViec/Controllers/TaskController.cs" Line="138" Column="81" />
-    </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
@@ -13,6 +9,7 @@
               <Node name="Controllers" expanded="True">
                 <Node name="ProjectController.cs" selected="True" />
               </Node>
+              <Node name="Models" expanded="True" />
             </Node>
           </Node>
         </State>

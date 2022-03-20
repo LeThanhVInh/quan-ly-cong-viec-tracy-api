@@ -107,11 +107,11 @@ namespace API_PhanCongCongViec.Controllers
                 else if (status == "FailedTask")
                     sql += @"                  and T.isFinished = 2 ";
                 else if (status == "AccomplishedTask")
-                    sql += @"                  and T.finishPercent=100 and T.isFinished=1 ";
+                    sql += @"                  and ISNULL(T.finishPercent,0)=100 and T.isFinished=1 ";
                 else if (status == "ProcessingTask")
-                    sql += @"                  and ( DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0 OR DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3 ) ";
+                    sql += @"                  and ( DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and (T.isFinished = 0 OR T.isFinished = 3) ) ";
                 else if (status == "LateTask")
-                    sql += @"                  and T.enddate < GETDATE() and T.finishPercent < 100 and T.isFinished = 0 ";
+                    sql += @"                  and T.enddate < GETDATE() and ISNULL(T.finishPercent,0) < 100 and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 ) ";
                 #endregion
 
                 #region filter task member
@@ -202,11 +202,11 @@ namespace API_PhanCongCongViec.Controllers
                 else if (status == "FailedTask")
                     sql += @"                  and T.isFinished = 2 ";
                 else if (status == "AccomplishedTask")
-                    sql += @"                  and T.finishPercent=100 and T.isFinished=1 ";
+                    sql += @"                  and ISNULL(T.finishPercent,0)=100 and T.isFinished=1 ";
                 else if (status == "ProcessingTask")
-                    sql += @"                  and ( DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0 OR DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 3 ) ";
+                    sql += @"                  and ( DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and (T.isFinished = 0 OR T.isFinished = 3) ) ";
                 else if (status == "LateTask")
-                    sql += @"                  and T.enddate < GETDATE() and T.finishPercent < 100 and T.isFinished = 0 ";
+                    sql += @"                  and T.enddate < GETDATE() and ISNULL(T.finishPercent,0) < 100 and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 ) ";
                 #endregion
 
                 #region filter task member
@@ -318,11 +318,11 @@ namespace API_PhanCongCongViec.Controllers
                 else if (status == "FailedTask")
                     sql += @"                  and T.isFinished = 2 ";
                 else if (status == "AccomplishedTask")
-                    sql += @"                  and T.finishPercent=100 and T.isFinished=1 ";
+                    sql += @"                  and ISNULL(T.finishPercent,0)=100 and T.isFinished=1 ";
                 else if (status == "ProcessingTask")
-                    sql += @"                  and DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and T.isFinished = 0 ";
+                    sql += @"                  and ( DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 and (T.isFinished = 0 OR T.isFinished = 3) ) ";
                 else if (status == "LateTask")
-                    sql += @"                  and T.enddate < GETDATE() and T.finishPercent < 100 and T.isFinished = 0 ";
+                    sql += @"                  and T.enddate < GETDATE() and ISNULL(T.finishPercent,0) < 100 and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 ) ";
                 #endregion
 
                 #region filter task member
