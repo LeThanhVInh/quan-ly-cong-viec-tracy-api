@@ -122,9 +122,7 @@ namespace API_PhanCongCongViec.Controllers
                                         message = "";
                                     }
                                 }
-                                if (message.Trim() == "")
-                                    ;//response = new ResponseJson(null, true, "Telegram không tìm thấy số điện thoại");
-                                else
+                                if (message.Trim() != "")
                                 {
                                     Connect.Exec("UPDATE tb_user set isTelegramConfirm=1, chatID_telegram=@chatID where id=@id",
                                                    new string[2] { "@chatID", "@id" },
