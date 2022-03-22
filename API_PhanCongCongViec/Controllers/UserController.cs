@@ -60,10 +60,12 @@ namespace API_PhanCongCongViec.Controllers
                     if (teamID.Trim() != "")
                     {
                         DataTable list = Connect.GetTable(@"
-                            SELECT TU.*, U.fullname
+                            SELECT TU.userID, U.fullname
                             FROM tb_TEAM_USER TU LEFT JOIN tb_USER U ON U.id=TU.userID
                             WHERE TU.teamID IN
-                                        (select name from SplitString(@arr,',')) ", new string[1] { "@arr" }, new object[1] { teamID });
+                                        (select name from SplitString(@arr,',')) 
+                            GROUP BY TU.userID, U.fullname ",
+                            new string[1] { "@arr" }, new object[1] { teamID });
 
                         if (list != null)
                             response = new ResponseJson(list, false, "");

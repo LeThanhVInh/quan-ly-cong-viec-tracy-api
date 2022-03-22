@@ -7,7 +7,7 @@ public static class StaticClass
                        CASE WHEN T.isFinished = 2
                             THEN N'Thất bại_brown'
                             ELSE
-                               CASE WHEN (DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 and T.isFinished = 3) OR ( T.startdate is null and T.enddate is null )
+                               CASE WHEN ( ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()) ,-1) < 0 and T.isFinished = 3) OR ( T.startdate is null and T.enddate is null )
                                     THEN N'Đang chờ_purple'
                                     ELSE
                                        CASE WHEN T.enddate < GETDATE()

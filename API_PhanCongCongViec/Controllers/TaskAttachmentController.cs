@@ -51,7 +51,14 @@ namespace API_PhanCongCongViec.Controllers
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
                 string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
-                if (author == "Administrator" || author == "ProjectManager")
+                int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+
+                int taskID = int.Parse((Connect.getField("tb_Task_attachment", "taskID", "id", id) ?? "0").ToString());
+                int taskGroupID = int.Parse((Connect.getField("tb_Task", "taskGroupID", "id", taskID) ?? "0").ToString());
+                int projectID = int.Parse((Connect.getField("tb_Task_Group", "projectID", "id", taskGroupID) ?? "0").ToString());
+                int projectManagerID = int.Parse((Connect.getField("tb_Project_Manager", "userID", "userID=" + authorID + " AND projectID", projectID) ?? "0").ToString());
+
+                if (author == "Administrator" || (author == "ProjectManager" && projectManagerID == authorID))
                 {
                     string link = _hostingEnvironment.WebRootPath + (Connect.getField("tb_task_Attachment", "('/File/TaskAttachments/' +filename + extension) link", "id", id) ?? "").ToString();
                     if (Connect.Exec(@"delete from tb_Task_Attachment where id=@id", new string[1] { "@id" }, new object[1] { id }))

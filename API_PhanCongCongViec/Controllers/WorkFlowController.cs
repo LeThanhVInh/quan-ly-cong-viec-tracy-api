@@ -47,7 +47,7 @@ namespace API_PhanCongCongViec.Controllers
                         #region 
                         DataRow NullRow = list.NewRow();
                         NullRow["id"] = 0;
-                        NullRow["name"] = "Chưa phân loại";
+                        NullRow["name"] = "Không phân loại";
                         #endregion
                         list.Rows.InsertAt(NullRow, 0);
 
@@ -83,7 +83,7 @@ namespace API_PhanCongCongViec.Controllers
                             #region 
                             DataRow NullRow = list.NewRow();
                             NullRow["id"] = 0;
-                            NullRow["name"] = "Chưa phân loại";
+                            NullRow["name"] = "Không phân loại";
                             #endregion
                             list.Rows.InsertAt(NullRow, 0);
 

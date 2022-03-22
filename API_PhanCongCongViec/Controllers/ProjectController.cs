@@ -114,9 +114,10 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID= P.id
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
-                                               )   
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
+                                               )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
@@ -135,7 +136,7 @@ namespace API_PhanCongCongViec.Controllers
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where TG.projectID= P.id
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
@@ -204,8 +205,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID= P.id 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                                )
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -234,7 +236,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) WaitingTask
@@ -303,8 +305,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID= P.id 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                                )
                                                and TM.userID=" + authorID + @"
                                         ) ProcessingTask,
@@ -330,14 +333,15 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID= P.id
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                                and TM.userID=" + authorID + @"
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
                                     FROM tb_Project P LEFT JOIN tb_Department DE ON P.departmentID=DE.id
+                                                      LEFT JOIN tb_Project_Manager PM ON PM.projectID=P.id
                                                       LEFT JOIN tb_Project_Member PMm ON PMm.projectID=P.id
-                                    WHERE PMm.userID=" + authorID + @" ";
+                                    WHERE PMm.userID=" + authorID + @" OR PM.userID = " + authorID + " ";
 
                     if ((searchString ?? "").Trim() != "")
                     {
@@ -402,8 +406,9 @@ namespace API_PhanCongCongViec.Controllers
                                                and TM.userID=tb_Member.userID 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                                )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -429,7 +434,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
@@ -475,8 +480,9 @@ namespace API_PhanCongCongViec.Controllers
                                                and TM.userID=tb_Member.userID 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                                )
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) ProcessingTask,
@@ -508,7 +514,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) WaitingTask
@@ -556,8 +562,9 @@ namespace API_PhanCongCongViec.Controllers
                                                and TM.userID=tb_Member.userID 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                                )
                                                and (TM.userID=" + authorID + @")
                                         ) ProcessingTask,
@@ -586,7 +593,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where TG.projectID=tb_Member.projectID 
                                                and TM.userID=tb_Member.userID 
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                                and (TM.userID=" + authorID + @")
                                         ) WaitingTask
@@ -649,8 +656,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where  TM.userID=tb_Member.userID 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                                )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -673,7 +681,7 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where  TM.userID=tb_Member.userID 
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
@@ -691,63 +699,52 @@ namespace API_PhanCongCongViec.Controllers
                         sql = @"
                                 SELECT tb_Member.* ,
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
-                                                                           LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                                                           LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
-                                         where  TM.userID=tb_Member.userID
-                                                and PM.userID = " + authorID + @"
+                                                                           LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
+                                         where  TM.userID=tb_Member.userID 
                                         ) TotalTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
-                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                                        LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where  TM.userID=tb_Member.userID 
                                                and T.enddate < GETDATE() 
                                                and ISNULL(T.finishPercent,0) < 100
                                                and ( ISNULL(T.isFinished,0) = 0 OR ISNULL(T.isFinished,0) = 3 )  
-                                               and PM.userID = " + authorID + @"
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
-                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                                        LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where  TM.userID=tb_Member.userID 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
-                                               )
-                                               and PM.userID = " + authorID + @"
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
+                                               ) 
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
-                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                                        LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where  TM.userID=tb_Member.userID 
                                                and ISNULL(T.finishPercent,0)=100 
-                                               and T.isFinished=1 
-                                               and PM.userID = " + authorID + @"
+                                               and T.isFinished=1  
                                         ) AccomplishedTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
-                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                                        LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where  TM.userID=tb_Member.userID 
-                                               and T.isFinished = 2
-                                               and PM.userID = " + authorID + @"
+                                               and T.isFinished = 2 
                                         ) FailedTask,
                                         ------------------------------------------------------------------------------------
                                         (select ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
-                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                                        LEFT JOIN tb_PROJECT_MEMBER PM ON PM.projectID=TG.projectID
+                                                        LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID 
                                          where  TM.userID=tb_Member.userID 
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
-                                               and T.isFinished = 3
-                                               and PM.userID = " + authorID + @"
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
+                                               and T.isFinished = 3 
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
                                 FROM 
@@ -791,8 +788,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where  TM.userID=tb_Member.userID 
                                                and 
                                                (
-                                                   DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                   and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                   (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                   OR 
+                                                   (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                                )
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -821,7 +819,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                          where  TM.userID=tb_Member.userID 
-                                               and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                               and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                                and T.isFinished = 3
                                                and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) WaitingTask
@@ -877,8 +875,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=P.id 
                                             and 
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -895,7 +894,7 @@ namespace API_PhanCongCongViec.Controllers
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where TG.projectID=P.id 
-                                            and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                            and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
@@ -928,8 +927,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=P.id 
                                             and 
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) ProcessingTask,
@@ -955,7 +955,7 @@ namespace API_PhanCongCongViec.Controllers
                                                                            LEFT JOIN tb_Project_Manager PM ON PM.projectID=TG.projectID
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                            and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @")
                                         ) WaitingTask
@@ -987,8 +987,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=P.id  
                                             and 
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                             and (TM.userID=" + authorID + @")
                                         ) ProcessingTask,
@@ -1011,7 +1012,7 @@ namespace API_PhanCongCongViec.Controllers
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                                                            LEFT JOIN tb_Task_Member TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                            and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                             and (TM.userID=" + authorID + @")
                                         ) WaitingTask
@@ -1056,10 +1057,11 @@ namespace API_PhanCongCongViec.Controllers
                                         ) LateTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
-                                         where 
+                                         where  
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -1073,7 +1075,7 @@ namespace API_PhanCongCongViec.Controllers
                                         ) FailedTask,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
-                                         where  DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                         where  ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
@@ -1099,10 +1101,11 @@ namespace API_PhanCongCongViec.Controllers
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_PROJECT_MANAGER PM ON TG.projectID=PM.projectID
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
-                                         where 
+                                         where  
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -1125,7 +1128,7 @@ namespace API_PhanCongCongViec.Controllers
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_PROJECT_MANAGER PM ON TG.projectID=PM.projectID
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
-                                         where  DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                         where  ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) WaitingTask
@@ -1148,10 +1151,11 @@ namespace API_PhanCongCongViec.Controllers
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                         where 
+                                         where  
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                             and TM.userID = " + authorID + @"
                                         ) ProcessingTask,
@@ -1171,7 +1175,7 @@ namespace API_PhanCongCongViec.Controllers
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
-                                         where  DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                         where  ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                             and TM.userID = " + authorID + @"
                                         ) WaitingTask
@@ -1201,7 +1205,7 @@ namespace API_PhanCongCongViec.Controllers
 
                 //if (author == "Administrator" || author == "ProjectManager")
                 {
-                    string sql = @" SELECT P.name ProjectName ,
+                    string sql = @" SELECT P.id ProjectID, P.name ProjectName , P.isPriority ,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where TG.projectID=P.id 
@@ -1219,8 +1223,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=P.id 
                                             and 
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                         ) ProcessingTask,
                                         ------------------------------------------------------------------------------------
@@ -1240,7 +1245,7 @@ namespace API_PhanCongCongViec.Controllers
                                         (select  ISNULL( CAST(count(T.id) as nvarchar) +'_'+  CAST( sum(ISNULL(T.finishPercent,0)) as nvarchar) , '0_0')
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                          where TG.projectID=P.id 
-                                            and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                            and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
@@ -1279,8 +1284,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=P.id 
                                             and 
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) ProcessingTask,
@@ -1309,7 +1315,7 @@ namespace API_PhanCongCongViec.Controllers
                                                         LEFT JOIN tb_PROJECT_MANAGER PM ON PM.projectID=TG.projectID
                                                         LEFT JOIN tb_TASK_MEMBER TM ON TM.taskID=T.id
                                          where TG.projectID=P.id 
-                                            and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                            and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                             and (PM.userID=" + authorID + @" OR TM.userID=" + authorID + @" )
                                         ) WaitingTask
@@ -1326,7 +1332,9 @@ namespace API_PhanCongCongViec.Controllers
                     else if (author == "Member")
                     {
                         #region sql
-                        sql = @"    SELECT P.name ProjectName ,
+                        sql = @"SELECT * from
+                               (
+                                    SELECT P.id ProjectID, P.name ProjectName , P.isPriority ,
                                         ------------------------------------------------------------------------------------
                                         (select count(T.id) from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id
                                                                            LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
@@ -1349,8 +1357,9 @@ namespace API_PhanCongCongViec.Controllers
                                          where TG.projectID=P.id 
                                             and 
                                             (
-                                                DATEDIFF(MINUTE, GETDATE(), T.enddate ) > 0 
-                                                and (T.isFinished = 0 OR T.isFinished = 3) 
+                                                (ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 0)
+                                                OR 
+                                                (ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) > 0 and ISNULL(DATEDIFF(MINUTE, GETDATE(), T.enddate ),-1) > 0 and T.isFinished = 3)
                                             )
                                             and TM.userID=" + authorID + @"
                                         ) ProcessingTask,
@@ -1376,15 +1385,19 @@ namespace API_PhanCongCongViec.Controllers
                                          from tb_TASK T LEFT JOIN tb_TASK_GROUP TG ON T.taskGroupID=TG.id 
                                                         LEFT JOIN tb_TASK_MEMBER TM ON T.id=TM.taskID
                                          where TG.projectID=P.id 
-                                            and DATEDIFF(MINUTE, T.startdate ,GETDATE()) < 0 
+                                            and ISNULL(DATEDIFF(MINUTE, T.startdate ,GETDATE()), -1) < 0 
                                             and T.isFinished = 3
                                             and TM.userID=" + authorID + @"
                                         ) WaitingTask
                                         ------------------------------------------------------------------------------------
                                     FROM tb_PROJECT P
                                                       LEFT JOIN tb_Project_Member PMm ON PMm.projectID=P.id
-                                    WHERE PMm.userID=" + authorID + @"
-                                    ORDER BY ISNULL(P.isPriority,0) desc , P.id desc";
+                                                      LEFT JOIN tb_Project_Manager PM ON PM.projectID=P.id
+                                    WHERE PMm.userID=" + authorID + @" OR PM.userID =" + authorID + @"
+                               ) AS tb1
+                               GROUP BY tb1.ProjectName , tb1.ProjectID, tb1.isPriority ,
+                                        tb1.TotalTask, tb1.LateTask, tb1.ProcessingTask, tb1.AccomplishedTask, tb1.FailedTask, tb1.WaitingTask
+                               ORDER BY ISNULL(tb1.isPriority,0) desc , tb1.ProjectID desc  ";
                         #endregion
                     }
 
