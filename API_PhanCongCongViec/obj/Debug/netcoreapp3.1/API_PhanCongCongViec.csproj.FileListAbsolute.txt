@@ -60,4 +60,3 @@
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.dll
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.pdb
 /Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.genruntimeconfig.cache
-/Users/vinharnold/Workspace/QL_CongViec_Tracy_React/API_PhanCongCongViec/API_PhanCongCongViec/obj/Debug/netcoreapp3.1/API_PhanCongCongViec.csproj.AssemblyReference.cache

@@ -22,6 +22,7 @@ namespace API_PhanCongCongViec.Controllers
         {
             _hostingEnvironment = environment;
         }
+        private string domain = "https://phanmemvas.vn:888";
 
         [HttpGet]
         public object GetListByTaskID(int id)
@@ -30,9 +31,10 @@ namespace API_PhanCongCongViec.Controllers
 
             if (AuthenFunctionProviders.CheckValidate(Request.Headers))
             {
+
                 DataTable list = Connect.GetTable(@"
                                              select TA.*,
-                                                    ('" + _hostingEnvironment.WebRootPath + @"/File/TaskAttachments/' +TA.filename + TA.extension) link
+                                                    ('" + domain + @"/File/TaskAttachments/' +TA.filename + TA.extension) link
                                              from tb_Task_Attachment TA
                                              where TA.taskID=@id", new string[1] { "@id" }, new object[1] { id });
 

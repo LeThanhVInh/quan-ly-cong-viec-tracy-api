@@ -2,23 +2,15 @@
   <MonoDevelop.Ide.ItemProperties.API__PhanCongCongViec PreferredExecutionTarget="/Applications/CocCoc.app" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="API_PhanCongCongViec/Controllers/TelegramController.cs" Line="15" Column="87" />
+      <File FileName="API_PhanCongCongViec/Controllers/TaskAttachmentController.cs" Line="25" Column="59" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="API_PhanCongCongViec" expanded="True">
-            <Node name="API_PhanCongCongViec" expanded="True">
-              <Node name="Controllers" expanded="True">
-                <Node name="TelegramController.cs" selected="True" />
-              </Node>
-              <Node name="wwwroot" expanded="True" />
-            </Node>
+            <Node name="API_PhanCongCongViec" expanded="True" selected="True" />
           </Node>
         </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using API_Tracy.Models;
 using API_Tracy.Providers;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,24 @@ namespace API_PhanCongCongViec.Controllers
                         if (item.Rows.Count > 0)
                             response = new ResponseJson(item, false, "");
                 }
+            }
+            return response;
+        }
+
+        public object GetMyProject()
+        {
+            ResponseJson response = new ResponseJson(null, true, "Không có dữ liệu");
+
+            if (AuthenFunctionProviders.CheckValidate(Request.Headers))
+            {
+                //string author = AuthenFunctionProviders.GetAuthority(Request.Headers);
+                int authorID = AuthenFunctionProviders.GetAuthorityID(Request.Headers);
+
+                DataTable myProject = Connect.GetTable("select projectID from tb_Project_Manager where userID=@id", new string[] { "@id" }, new object[] { authorID });
+
+                if (myProject != null)
+                    if (myProject.Rows.Count > 0)
+                        response = new ResponseJson(myProject.Rows[0].ItemArray.Select(x => x.ToString()).ToArray(), false, "");
             }
             return response;
         }
